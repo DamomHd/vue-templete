@@ -15,7 +15,9 @@ const router = new VueRouter({
  * 权限验证
  */
 // router.beforeEach((to, from, next) => {
-
+//     console.log(to)
+//     console.log(from)
+//     next();
 // })
 
 router.afterEach((to) => {

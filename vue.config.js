@@ -1,6 +1,9 @@
 
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+//用于开启gzip压缩的插件
+const CompressionPlugin = require('compression-webpack-plugin')
+// 引入插件
+const vConsolePlugin = require('vconsole-webpack-plugin');
 const px2rem = require('postcss-px2rem')
 // 增加环境变量
 process.env.VUE_APP_VERSION = require('./package.json').version
@@ -17,7 +20,38 @@ module.exports = {
     publicPath,
     lintOnSave: true,
     devServer: {
-        publicPath // 和 publicPath 保持一致
+        publicPath, // 和 publicPath 保持一致
+        // 端口
+        // port: 3000,
+        // // 配置代理
+        // proxy: {
+        //     '^/api': {
+        //         target: 'http://localhost:8081',
+        //         ws: true,
+        //         changeOrigin: true
+        //     },
+        //     '^/data': {
+        //         target: 'http://localhost:3000'
+        //     }
+        // },
+        // // mock
+        // before(app) {
+        //     app.get('/api/getUser', (req, res, next) => {
+        //         res.json(mockData);
+        //     })
+        // }
+    },
+    configureWebpack: config => {
+        //配置gzip压缩
+        if (process.env.NODE_ENV === 'production') {
+            return {
+                plugins: [new CompressionPlugin({
+                    test: /\.js$|\.html$|\.css/,//文件匹配名
+                    threshold: 10240,//对超过10K的数据进行压缩
+                    deleteOriginalAssets: false // 是否删除原文件
+                })]
+            }
+        }
     },
     css: {
         loaderOptions: {
@@ -64,6 +98,7 @@ module.exports = {
                                 // 移除 console
                                 // 其它优化选项 https://segmentfault.com/a/1190000010874406
                                 compress: {
+                                    // warnings: false,
                                     drop_console: true,
                                     drop_debugger: true,
                                     pure_funcs: ['console.log']
@@ -71,6 +106,22 @@ module.exports = {
                             }
                         })
                     ])
+
+                // config
+                //     .plugin('vconsole')
+                //     .use(vConsolePlugin, [{ enable: true }])
+                config.module
+                    .rule('images')
+                    .test(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/)
+                    .use('url-loader')
+                    .loader('url-loader')
+                    .tap(options => Object.assign(options, { limit: 10240 }))
             })
+
+
+
+
+
+
     }
 }
