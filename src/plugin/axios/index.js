@@ -72,6 +72,7 @@ service.interceptors.request.use(
             '/oauth/token'
         ]
         let requestURL = config.url
+        config.headers['test'] = '123'
         // 如果是登陆接口
         if (loginMap.includes(requestURL)) {
             config.headers['Authorization'] = `Basic ZHdjaGF0OjEyMzQ1Ng==`
@@ -160,6 +161,7 @@ service.interceptors.response.use(
             }
         }
         errorLog(error)
+
         return Promise.reject(error)
     }
 )

@@ -5,8 +5,6 @@ import router from './router'
 import store from '@/store/index'
 // 个性化插件
 import Vincent from '@/plugin/Vincent/index'
-
-
 Vue.use(Vincent)
 
 

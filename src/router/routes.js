@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-03 15:31:50
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-08-28 17:15:31
+ * @description: 
+ */
 
 
 // 由于懒加载页面太多的话会造成webpack热更新太慢，所以开发环境不使用懒加载，只有生产环境使用懒加载

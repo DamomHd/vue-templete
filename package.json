@@ -20,7 +20,7 @@
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "lib-flexible": "^0.3.2",
-    "postcss-px2rem": "^0.3.0",
+    "px2rem-loader": "^0.1.9",
     "reset-css": "^4.0.1",
     "style-loader": "^0.23.1",
     "svg-sprite-loader": "^4.1.6",

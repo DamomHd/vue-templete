@@ -9,7 +9,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import filter from '@/plugin/Vincent/filter'
 
 //按需导入nutui组件
-import { Dialog, Picker, Toast } from '@nutui/nutui';
+import { Dialog, Picker, Toast, ImagePicker } from '@nutui/nutui';
 
 export default {
     install(Vue) {
@@ -32,5 +32,7 @@ export default {
         Dialog.install(Vue);
         Picker.install(Vue);
         Toast.install(Vue);
+        ImagePicker.install(Vue);
+
     }
 }

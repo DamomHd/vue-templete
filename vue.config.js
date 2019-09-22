@@ -4,7 +4,6 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
 // 引入插件
 const vConsolePlugin = require('vconsole-webpack-plugin');
-const px2rem = require('postcss-px2rem')
 // 增加环境变量
 process.env.VUE_APP_VERSION = require('./package.json').version
 process.env.VUE_APP_BUILD_TIME = require('dayjs')().format('YYYY-M-D HH:mm:ss')
@@ -57,32 +56,41 @@ module.exports = {
         loaderOptions: {
             // 设置 scss 公用变量文件
             sass: {
-                data: `@import '~@/assets/style/public.scss';`
-            },
-            postcss: {
-                plugins: [
-                    px2rem({
-                        remUnit: 75
-                    })
-                ]
+                data: ` 
+                        @import '~@/assets/style/public.scss';
+                        @import "@nutui/nutui/dist/styles/index.scss";   
+                        ` //nui如果需要按需加载 scss 文件（如需要自定义主题）时，除了需要把 style 选项值设为为 scss 外sass-loader 配置，如下所示：
             }
         },
 
     },
     chainWebpack: config => {
         /**
-   * 删除懒加载模块的 prefetch preload，降低带宽压力
-   * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#prefetch
-   * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#preload
-   * 而且预渲染时生成的 prefetch 标签是 modern 版本的，低版本浏览器是不需要的
-   */
+         * 删除懒加载模块的 prefetch preload，降低带宽压力
+         * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#prefetch
+         * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#preload
+         * 而且预渲染时生成的 prefetch 标签是 modern 版本的，低版本浏览器是不需要的
+         */
         config.plugins
             .delete('prefetch')
             .delete('preload')
         // 解决 cli3 热更新失效 https://github.com/vuejs/vue-cli/issues/1559
         config.resolve
             .symlinks(true)
-
+        //配置移动端自适应rem
+        config.module
+            .rule('scss')
+            .oneOf('vue')
+            .use('px2rem-loader')
+            .loader('px2rem-loader')
+            .before('postcss-loader') // this makes it work.
+            .options({ remUnit: 75, remPrecision: 8 })
+            .end()
+        config.module
+            .rule('images')
+            .use('url-loader')
+            .loader('url-loader')
+            .tap(options => Object.assign(options, { limit: 10240 }))
         config
             // 开发环境
             .when(process.env.NODE_ENV === 'development',
@@ -106,17 +114,10 @@ module.exports = {
                             }
                         })
                     ])
-
-                // config
-                //     .plugin('vconsole')
-                //     .use(vConsolePlugin, [{ enable: true }])
-                config.module
-                    .rule('images')
-                    .test(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/)
-                    .use('url-loader')
-                    .loader('url-loader')
-                    .tap(options => Object.assign(options, { limit: 10240 }))
             })
+
+
+
 
 
 
