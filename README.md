@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-09-22 12:28:53
+ * @LastEditTime: 2019-09-22 12:30:22
  * @description: 
  -->
 # test
@@ -39,6 +39,5 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-【前端公虾米】
 
-Gitmoji Commit 演示
+
