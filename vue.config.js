@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-02 11:46:02
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-10-22 16:49:44
+ * @description: 
+ */
 
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 //用于开启gzip压缩的插件
@@ -55,11 +64,20 @@ module.exports = {
     css: {
         loaderOptions: {
             // 设置 scss 公用变量文件
-            sass: {
-                data: ` 
-                        @import '~@/assets/style/public.scss';
-                        @import "@nutui/nutui/dist/styles/index.scss";   
-                        ` //nui如果需要按需加载 scss 文件（如需要自定义主题）时，除了需要把 style 选项值设为为 scss 外sass-loader 配置，如下所示：
+            // sass: {
+            //     data: ` 
+            //             @import '~@/assets/style/public.scss';
+            //             @import "@nutui/nutui/dist/styles/index.scss";   
+            //             ` //nui如果需要按需加载 scss 文件（如需要自定义主题）时，除了需要把 style 选项值设为为 scss 外sass-loader 配置，如下所示：
+            // }
+            //覆盖vant主题色
+            less: {
+                modifyVars: {
+                    red: '#03a9f4',
+                    blue: '#3eaf7c',
+                    orange: '#f08d49',
+                    'text-color': '#111'
+                }
             }
         },
 

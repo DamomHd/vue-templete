@@ -1,10 +1,19 @@
+/*
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-15 10:40:11
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-10-25 11:13:40
+ * @description: 
+ */
 import store from '@/store'
 import axios from 'axios'
 import util from '@/libs/util'
 import qs from 'querystring'
-import { Toast } from '@nutui/nutui';
+// import { Toast } from '@nutui/nutui';
 import Vue from 'vue'
-Toast.install(Vue)
+// Toast.install(Vue)
 let ve = new Vue()
 // 创建一个错误
 function errorCreate(msg) {
@@ -34,9 +43,9 @@ function errorLog(error) {
     //     type: 'error',
     //     duration: 5 * 1000
     // })
-    ve.$toast.fail(error.message, {
-        duration: 5 * 1000,
-    })
+    // ve.$toast.fail(error.message, {
+    //     duration: 5 * 1000,
+    // })
 }
 
 // 创建一个 axios 实例

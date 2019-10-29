@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-05 15:09:42
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-07-15 11:05:41
+ * @LastEditTime: 2019-10-28 17:37:46
  * @description: 个人常用API
  */
 
@@ -181,26 +181,56 @@ const vincent = {
             }
         }
     },
-	objToUrl:obj=>{
-		let arr = [];
-		for(let i in obj){
-			if (obj.hasOwnProperty(i)) {
-				arr.push(encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]));
-			}
-		}
-		return arr.join("&");
-	},
-	urlToObj : url => {
-		let string = url.split('&');
-		let res = {};
-		for(let i = 0;i<string.length;i++){
-			let str = string[i].split('=');
-			if(str[0]!=''){
-				res[str[0]]=str[1];
-			}
-		}
-		return res;
-	}
+    objToUrl: obj => {
+        let arr = [];
+        for (let i in obj) {
+            if (obj.hasOwnProperty(i)) {
+                arr.push(encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]));
+            }
+        }
+        return arr.join("&");
+    },
+    urlToObj: url => {
+        let string = url.split('&');
+        let res = {};
+        for (let i = 0; i < string.length; i++) {
+            let str = string[i].split('=');
+            if (str[0] != '') {
+                res[str[0]] = str[1];
+            }
+        }
+        return res;
+    },
+    //创建唯一标识，可以自定义生成字段长度
+    createId: (length = 12) => {
+        return Number(Math.random().toString().substr(3, length) + Date.now()).toString(36);
+    },
+    //用户名打码
+    nameCode: (str) => {
+        return str.substr(0, 1) + '*'.repeat(str.length - 1);
+    },
+    //判断是否是数组
+    isArray: (arg) => {
+        return Array.isArray ? Array.isArray(arg) : Object.prototype.toString.call(arg) === '[object Array]'
+    },
+    //数组删除虚值
+    filterVoid: (arr) => {
+        return arr.filter(Boolean)
+    },
+    //求两个数组的交集
+    intersectionArr: (arr1, arr2) => {
+        return [...new Set(arr1)].filter(item => arr2.includes(item))
+    },
+    //求两个数组的并集
+    joinArr: (arr1, arr2) => {
+        return [...new Set([...arr1, ...arr2])]
+    },
+    //求两个数组的差集
+    differenceArr: (arr1, arr2) => {
+        return [...arr1.filter(v => !new Set(arr2).has(v)), ...arr2.filter(v => !new Set(
+            arr1)
+            .has(v))]
+    }
 }
 
 export default vincent

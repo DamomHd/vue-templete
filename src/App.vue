@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-09-22 12:39:24
+ * @LastEditTime: 2019-10-22 16:26:28
  * @description: 
  -->
 <template>
@@ -17,9 +17,11 @@
 export default {
   name: "app",
   data() {
-    return {
-      emoji: "🎨🔒"
-    };
+    return {};
+  },
+  //移动端追加active效果
+  created() {
+    document.body.addEventListener("touchstart", () => {});
   }
 };
 </script>

@@ -4,15 +4,14 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:41:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-07-17 11:47:41
+ * @LastEditTime: 2019-10-28 14:05:32
  * @description: 
  -->
 
 <template>
-  <div>
-    <router-link :to="{path:'test'}">跳转测试</router-link>
-    <nut-imagepicker @imgMsg="imgMsg" :imgList="imgList1">
-    </nut-imagepicker>
+  <div class="container">
+    <p>{{10|roundPrice}}</p>
+    <router-link :to="{path:'test'}">{{' 跳 转 测 试     '|trim('AROUND')}}</router-link>
   </div>
 
 </template>
@@ -37,6 +36,7 @@ export default {
   components: {},
   methods: {
     async init() {
+      this.$toast("提示信息");
       this.a = this.list.filter(item => item.id > 2);
       console.log(this.list.includes(item => item.id === 3));
       let res = await GetUserInfo({
@@ -56,5 +56,8 @@ export default {
 <style lang="scss" scoped>
 /deep/ .nut-imagepicker .img-list .img-item {
   width: 100px !important;
+}
+.container {
+  padding-top: 50px;
 }
 </style>
