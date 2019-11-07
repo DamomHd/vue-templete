@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:31:50
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-08-28 17:15:31
+ * @LastEditTime: 2019-11-07 17:26:18
  * @description: 
  */
 
@@ -17,18 +17,18 @@ const frame = [
         name: 'index',
         meta: {
             auth: true,
-            title: '首页'
+            title: '商品详情'
         },
-        component: _import('index')
+        component: _import('product/index.vue')
     },
     {
         path: '/test',
-        name: 'test',
+        name: 'productDetail',
         meta: {
             auth: true,
             title: '测试'
         },
-        component: _import('test')
+        component: _import('product/index.vue')
     },
     {
         path: '/study',

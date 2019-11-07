@@ -1,0 +1,5 @@
+.icon { background-image: url(../images/sprites.png) }
+.icon-car { width: 0.64rem ; height: 0.64rem; background-position: 0rem 0rem;background-repeat: no-repeat;background-size: 1.3066666666666666rem 1.3066666666666666rem; }
+.icon-collect_dis { width: 0.64rem ; height: 0.64rem; background-position: -0.6666666666666666rem 0rem;background-repeat: no-repeat;background-size: 1.3066666666666666rem 1.3066666666666666rem; }
+.icon-collect { width: 0.64rem ; height: 0.64rem; background-position: 0rem -0.6666666666666666rem;background-repeat: no-repeat;background-size: 1.3066666666666666rem 1.3066666666666666rem; }
+.icon-delete { width: 0.37333333333333335rem ; height: 0.37333333333333335rem; background-position: -0.6666666666666666rem -0.6666666666666666rem;background-repeat: no-repeat;background-size: 1.3066666666666666rem 1.3066666666666666rem; }

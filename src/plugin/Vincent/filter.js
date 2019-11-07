@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 16:35:48
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-10-28 13:49:40
+ * @LastEditTime: 2019-11-05 17:43:08
  * @description: 全局过滤器
  */
 
@@ -61,5 +61,8 @@ export default {
     //用户名打码
     nameCode: (str) => {
         return str.substr(0, 1) + '*'.repeat(str.length - 1);
+    },
+    toNumber: (str) => {
+        return Number(str)
     }
 }

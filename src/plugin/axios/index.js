@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-15 10:40:11
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-10-25 11:13:40
+ * @LastEditTime: 2019-11-07 15:57:35
  * @description: 
  */
 import store from '@/store'
@@ -12,9 +12,8 @@ import axios from 'axios'
 import util from '@/libs/util'
 import qs from 'querystring'
 // import { Toast } from '@nutui/nutui';
-import Vue from 'vue'
-// Toast.install(Vue)
-let ve = new Vue()
+
+
 // 创建一个错误
 function errorCreate(msg) {
     const error = new Error(msg)
@@ -43,24 +42,26 @@ function errorLog(error) {
     //     type: 'error',
     //     duration: 5 * 1000
     // })
-    // ve.$toast.fail(error.message, {
-    //     duration: 5 * 1000,
-    // })
+    util.toast(error.message, {
+        duration: 5 * 1000,
+    })
 }
 
 // 创建一个 axios 实例
 const service = axios.create({
-    baseURL: process.env.VUE_APP_API,
-    withCredentials: true,//设置避免set-cookie隐藏
+    // baseURL: process.env.NODE_ENV === 'development' ? '' : process.env.VUE_APP_API,
+    withCredentials: false,//设置避免set-cookie隐藏
+    responseType: 'json',   // 响应数据格式
+    responseEncoding: 'utf8',  // 响应数据编码
     timeout: 5000 // 请求超时时间
 })
-axios.defaults.withCredentials = true
+
 
 // 请求拦截器
 service.interceptors.request.use(
     config => {
         // 在请求发送之前做一些处理
-        console.log(config.isFile)
+        console.log(config)
         // form
         if (!config.isJson && !config.isFile) {
             config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -75,13 +76,15 @@ service.interceptors.request.use(
             config.headers['Content-Type'] = 'application/json;charset=utf-8'
         }
 
+        // if (config.url == '/v2/signin_check') {
+        //     config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        // }
         let loginMap = [
             // '/provider-auth-server/oauth/email',
             // '/provider-auth-server/oauth/mobile',
             '/oauth/token'
         ]
         let requestURL = config.url
-        config.headers['test'] = '123'
         // 如果是登陆接口
         if (loginMap.includes(requestURL)) {
             config.headers['Authorization'] = `Basic ZHdjaGF0OjEyMzQ1Ng==`

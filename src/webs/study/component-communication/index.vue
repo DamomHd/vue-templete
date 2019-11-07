@@ -1,3 +1,12 @@
+<!--
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-11 15:38:46
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-10-29 16:58:57
+ * @description: 
+ -->
 <template>
   <div class="content">
     <p>我是父组件A</p>
@@ -48,10 +57,10 @@ export default {
   created() {}
 };
 </script>
-<style lang="scss">
+<style scoped lang="less">
 .content {
   font-size: 30px;
-  background: skyblue;
+  // background: @themeColor;
   padding: 10px;
   box-sizing: border-box;
 }

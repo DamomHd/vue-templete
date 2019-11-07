@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 10:44:05
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-10-29 11:40:42
+ * @LastEditTime: 2019-10-29 17:34:07
  * @description: 
  -->
 <!-- The ref attr used to find the swiper instance -->
@@ -13,7 +13,7 @@
     <!-- slides -->
     <!-- <swiper-slide v-for="(slide, index) in swiperSlides" :key="index">I'm Slide {{ slide }}</swiper-slide> -->
     <swiper-slide v-for="item in swiperSlides" :key="item.imgUrl" @ontap="tap">
-      <div class="carousel_img-box col col-center" :class="parent+'_height'">
+      <div class="carousel_img-box" :class="parent+'_height'">
         <div @click="jump(item.targetUrl)" class="row row-center hover">
           <img :src="item.imgUrl" alt="" class="carousel_img">
         </div>

@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-05 15:09:42
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-10-28 17:37:46
+ * @LastEditTime: 2019-10-29 15:18:02
  * @description: 个人常用API
  */
 
@@ -200,6 +200,18 @@ const vincent = {
             }
         }
         return res;
+    },
+    // 请求参数序列号
+    formatParams: (params) => {
+        let str = decodeURIComponent(params);
+        let paras = {};
+        str = str.split('&');
+        for (let n in str) {
+            let name = str[n].split('=')[0];
+            let val = str[n].split('=')[1];
+            paras[name] = val;
+        }
+        return paras;
     },
     //创建唯一标识，可以自定义生成字段长度
     createId: (length = 12) => {

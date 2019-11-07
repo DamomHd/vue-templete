@@ -1,4 +1,14 @@
+/*
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-03 16:26:29
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-10-29 13:53:05
+ * @description: 
+ */
 import cookies from './util.cookies'
+import { Toast } from 'vant';
 
 import log from './util.log'
 const util = {
@@ -15,6 +25,9 @@ util.title = function (titleText) {
     window.document.title = `${processTitle}${titleText ? ` | ${titleText}` : ''}`
 }
 
+util.toast = function (options) {
+    Toast(options)
+}
 
 
 

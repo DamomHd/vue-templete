@@ -4,14 +4,18 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:41:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-10-28 14:05:32
+ * @LastEditTime: 2019-11-06 16:25:45
  * @description: 
  -->
 
 <template>
   <div class="container">
     <p>{{10|roundPrice}}</p>
-    <router-link :to="{path:'test'}">{{' 跳 转 测 试     '|trim('AROUND')}}</router-link>
+    <router-link :to="{path:'test',query:{id:'7okip71w'}}">{{' 测试     '|trim('AROUND')}}</router-link>
+    <div class="test icon icon-car">
+
+    </div>
+    <a href="javascript:void(0)" class="css-item icon icon-car">CSS交互效果</a>
   </div>
 
 </template>
@@ -53,11 +57,28 @@ export default {
   }
 };
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
 /deep/ .nut-imagepicker .img-list .img-item {
   width: 100px !important;
 }
 .container {
   padding-top: 50px;
+}
+.css-item {
+  display: inline-block;
+  width: 750px;
+  height: 100px;
+  background: @themeColor;
+  color: #fff;
+  line-height: 100px;
+  margin-top: 100px;
+}
+.css-item:hover {
+  opacity: 0.6;
+}
+
+.test {
+  width: 60px;
+  height: 60px;
 }
 </style>

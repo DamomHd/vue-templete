@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-15 11:16:53
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-07-17 14:41:46
+ * @LastEditTime: 2019-11-07 15:58:43
  * @description: 
  */
 
@@ -20,9 +20,8 @@ import request from '@/plugin/axios'
  */
 export function GetUserInfo(data) {
     return request({
-        url: '/api/login',
-        method: 'post',
-        isJson: true,
+        url: '/v2/signin_check',
+        method: 'get',
         data
     })
 }
