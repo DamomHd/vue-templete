@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:41:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-06 16:25:45
+ * @LastEditTime: 2019-11-12 17:43:01
  * @description: 
  -->
 
@@ -21,6 +21,7 @@
 </template>
 <script>
 import { GetUserInfo } from "@/api/login";
+
 export default {
   name: "index",
   props: {},
@@ -34,7 +35,8 @@ export default {
           src:
             "//img1.360buyimg.com/da/jfs/t1/4436/26/9691/78074/5bad0668E7ce89ec6/c234b749ae9e7332.jpg"
         }
-      ]
+      ],
+      number: 4
     };
   },
   components: {},

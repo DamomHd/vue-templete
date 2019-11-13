@@ -1,13 +1,9 @@
-// @import '~@/assets/style/public.less';
-.container{
-    background: #000;
-
-}
 
  .container-refresh /deep/.van-pull-refresh__track{
     // position: relative;
     // width: 750px;
     // height: 100vh;
+    background-color: @pageBgColor;
 }
 .detail-content{
   color: #fff;
@@ -17,13 +13,24 @@
   display: block;
   width: 750px;
 }
+.top-btn{
+  position: fixed;
+  right: 0;
+  top:20px;
+  z-index: 2;
+}
+.top-btn>a{
+  display: inline-block;
+  margin-right: 20px;
+}
 .detail-box {
     padding-bottom: 100px;
     width: 750px;
+    position: relative;
   }
   .pro-hd {
     background-color: #fff;
-    padding: 0 30px;
+    padding: 20px 30px;
     &-top {
       display: flex;
       flex-direction: row;
@@ -80,7 +87,7 @@
       padding: 0 10px;
     }
     &-title {
-      margin-top: 20px;
+      // margin-top: 20px;
       &-content {
         font-size: 30px;
         color: @color-text-title;
@@ -140,10 +147,6 @@
   .icon-title {
     font-size: 24px;
     color: @color-text-caption;
-  }
-  .share-btn {
-    background-color: @orderColor;
-    border-radius: 0;
   }
   .buy-btn {
     background-color: @themeColor;
@@ -243,6 +246,9 @@
       line-height: 80px;
       text-align: center;
     }
+  }
+  .container{
+    height: 100vh;
   }
   
   /* 商品规格 */
@@ -391,10 +397,14 @@
     /*flex-direction: row;*/
     justify-content: space-between;
   }
+  .recommend-box{
+    margin-top: 20px;
+  }
   .recommend-item {
     width: 350px;
     display: inline-block;
     margin-bottom: 20px;
+    background-color: #fff;
   }
   .recommend-nav {
     border-left: 6px solid @themeColor;
@@ -402,8 +412,10 @@
     font-size: 28px;
     color: #333;
     text-align: left;
-    margin-left: 20px;
+    margin-top: 20px;
     padding-left: 20px;
+    line-height: 60px;
+    background-color: #fff;
   }
   .recommend-title {
     width: 350px;
@@ -454,4 +466,133 @@
     right: 20px;
     top: 20px;
     z-index: 2019;
+  }
+
+
+  .ttz-dep{
+    font-size: 26px;
+    margin-right: 20px;
+  }
+
+  .ttz-card-name{
+
+    background:linear-gradient(132deg,rgba(220,38,115,1),rgba(163,17,79,1));
+    border-radius:4px;
+    color: #fff;
+    font-size: 26px;
+    padding: 8px 10px;
+    margin-left: 20px;
+  }
+.ttz-info{
+  padding: 20px 0;
+}
+
+
+
+  // 销售协议弹窗
+  .sales-dialog{
+
+  }
+  .sales-dialog-content{
+    width: 560px;
+    height: 880px;
+    background-color: #fff;
+    position: relative;
+  }
+  .sales-dialog+.van-dialog{
+    width: auto;
+    border-radius: 8px;
+
+  }
+  .sales-dialog-content .close-btn {
+    display: inline-block;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+  .sales-dialog-content .sales-dialog-title{
+    font-size: 30px;
+    color: #222;
+    line-height: 100px;
+    font-weight: bold;
+  }
+  .sales-dialog-content .sales-agreement-content{
+    width: 100%;
+    height: 550px;
+    padding:0 40px 40px;
+    box-sizing: border-box;
+    text-align: left;
+    overflow-y: auto;
+  }
+  .sales-dialog-content .sales-agree-btn{
+    width:480px;
+    height:88px;
+    background:@themeColor;
+    border-radius:8px;
+    line-height: 88px;
+    color: #fff;
+    display: block;
+    margin: 10px auto;
+  }
+  .sales-dialog-content .sales-cancel-btn{
+    width:480px;
+    height:88px;
+    line-height: 88px;
+    color: @themeColor;
+    display: block;
+    margin: 10px auto;
+  }
+
+  //分享的相关
+  .share-popup{
+    font-size: 24px;
+    text-align: center;
+
+
+  }
+  .share-title{
+    font-size: 30px;
+    color: #fff;
+    line-height: 60px;
+  }
+  .share-content{
+    color: #bbb;
+    line-height: 60px;
+  }
+  .share-popup .share-btn{
+    color: #fff;
+    font-size: 24px;
+    line-height: 50px;
+  }
+  .share-close-btn{
+    margin-top: 80px;
+    margin-bottom: 20px;
+  }
+
+// 包裹补贴部分
+  /deep/ .van-overlay.share-overlay{
+    backdrop-filter: blur(10px);
+    color: #fff;
+  }
+  .share-ttz-package{
+    width:702px;
+    background:rgba(255,255,255,0.04);
+    border-radius:8px;
+    margin: 0 auto 50px;
+  }
+  .share-ttz-package p{
+    width: 50%;
+    text-align: center;
+    line-height: 50px;
+    color: #bbb;
+  }
+  .share-ttz-package  .share-ttz-package-title{
+    font-size: 30px;
+    color: #FFCF10;
+
+  }
+  .share_guide_img{
+    display: inline-block;
+    width: 750px;
+    cursor: pointer;
   }

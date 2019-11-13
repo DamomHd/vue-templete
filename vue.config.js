@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 17:45:30
+ * @LastEditTime: 2019-11-12 16:28:47
  * @description: 
  */
 //JS压缩
@@ -22,7 +22,7 @@ const templateFunction = function (data) {
         .replace('I', data.sprites[0].image);
 
     var perSprite = data.sprites.map(function (sprite) {
-        return '.icon-N { width: Wrem ; height: Hrem; background-position: Xrem Yrem;background-repeat: no-repeat;background-size: Erem Frem; }'
+        return '.icon.icon-N { width: Wrem ; height: Hrem; background-position: Xrem Yrem;background-repeat: no-repeat;background-size: Erem Frem; }'
             .replace('N', sprite.name)
             .replace('W', sprite.width / 75)
             .replace('H', sprite.height / 75)
@@ -45,14 +45,14 @@ const resolve = dir => require('path').join(__dirname, dir)
 const path = require("path");
 // 基础路径 注意发布之前要先修改这里
 //开发绝对路径  线上相对路径
-let publicPath = process.env.NODE_ENV === 'development' ? '/' : './'
+let publicPath = process.env.NODE_ENV === 'development' ? '/' : '/pStatic'
 
 console.log(publicPath)
 
 module.exports = {
     publicPath,
     lintOnSave: true,
-    outputDir: 'product',  //打包后的静态资源目录
+    outputDir: 'pStatic',  //打包后的静态资源目录
     //关闭source map
     productionSourceMap: false,
 
@@ -63,8 +63,19 @@ module.exports = {
         host: "localhost",
         // 端口
         // port: 3000,
+
+        //默认情况下，生成的静态资源在它们的文件名中包含了 hash 以便更好的控制缓存。你可以通过将这个选项设为 false 来关闭文件名哈希。(false的时候就是让原来的文件名不改变)
+        // filenameHashing: false,
+        /**
+         * 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
+         *  打包之后发现map文件过大，项目文件体积很大，设置为false就可以不输出map文件
+         *  map文件的作用在于：项目打包后，代码都是经过压缩加密的，如果运行时报错，输出的错误信息无法准确得知是哪里的代码报错。
+         *  有了map就可以像未加密的代码一样，准确的输出是哪一行哪一列有错。
+         * */
+        // productionSourceMap: false,
         // // 配置代理
         proxy: process.env.VUE_APP_API,
+
     },
 
     configureWebpack: config => {

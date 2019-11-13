@@ -4,19 +4,19 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:26:18
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 17:48:21
+ * @LastEditTime: 2019-11-13 18:14:09
  * @description: 
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import util from '@/libs/util.js'
-
+import { wechatAuth } from "@/plugin/Vincent/wechatConfig.js";
 Vue.use(VueRouter)
 // 路由数据
 import routes from './routes'
 const router = new VueRouter({
     mode: 'history',
-    // base: '/dist/',
+    base: '/pNew',
     routes
 })
 
@@ -34,5 +34,10 @@ const router = new VueRouter({
 router.afterEach((to) => {
     // 更改标题
     util.title(to.meta.title)
+    //允许分享 设置分享信息
+    //初始化设置一次分享信息
+    if (!to.meta.allowShare) {
+        wechatAuth();
+    }
 })
 export default router

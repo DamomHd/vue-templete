@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 13:20:49
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 14:30:11
+ * @LastEditTime: 2019-11-12 11:20:29
  * @description: 
  */
 import request from '@/plugin/axios'
@@ -101,6 +101,86 @@ export function addCart(data) {
 export function updateCollectProduct(type, data) {
     return request({
         url: `/v2/productCollection/${type}`,
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * @description:查询我的团团转会员 
+ * @param {type} 
+ * @LastEditTime: 
+ * @return: 
+ * @LastEditors: vincent_Huanghd@126.com
+ * @Date: 2019-10-29 15:24:07
+ */
+export function queryMyTtzVip(data) {
+    return request({
+        url: '/v2/ttzvip/myVip',
+        method: 'get',
+        data
+    })
+}
+
+/**
+ * @description:查询是否加入会员 
+ * @param {type} 
+ * @LastEditTime: 
+ * @return: 
+ * @LastEditors: vincent_Huanghd@126.com
+ * @Date: 2019-10-29 15:24:07
+ */
+export function queryIsTtzVip(data) {
+    return request({
+        url: '/v2/ttzvip/isAnyVip',
+        method: 'get',
+        data
+    })
+}
+
+/**
+ * @description:默认加入普通会员 
+ * @param {type} 
+ * @LastEditTime: 
+ * @return: 
+ * @LastEditors: vincent_Huanghd@126.com
+ * @Date: 2019-10-29 15:24:07
+ */
+export function createVipUser(data) {
+    return request({
+        url: '/v2/ttzvip/createVipUser',
+        method: 'post',
+        data
+    })
+}
+
+
+/**
+ * @description:查询商品销售协议 
+ * @param {type} 
+ * @LastEditTime: 
+ * @return: 
+ * @LastEditors: vincent_Huanghd@126.com
+ * @Date: 2019-10-29 15:24:07
+ */
+export function querySalesAgreement(data) {
+    return request({
+        url: '/v2/agreement/selectByType',
+        method: 'get',
+        data
+    })
+}
+/**
+ * @description:同意商品销售协议 
+ * @param {type} 
+ * @LastEditTime: 
+ * @return: 
+ * @LastEditors: vincent_Huanghd@126.com
+ * @Date: 2019-10-29 15:24:07
+ */
+export function agreeSalesAgreement(data) {
+    return request({
+        url: '/v2/userAgreement/insert',
         method: 'post',
         data
     })

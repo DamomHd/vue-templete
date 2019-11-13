@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-15 10:40:11
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 15:57:35
+ * @LastEditTime: 2019-11-08 13:42:57
  * @description: 
  */
 import store from '@/store'
@@ -61,7 +61,7 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
         // 在请求发送之前做一些处理
-        console.log(config)
+        // console.log(config)
         // form
         if (!config.isJson && !config.isFile) {
             config.headers['Content-Type'] = 'application/x-www-form-urlencoded'

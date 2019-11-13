@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-05 15:09:42
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-10-29 15:18:02
+ * @LastEditTime: 2019-11-13 14:57:22
  * @description: 个人常用API
  */
 
@@ -242,6 +242,11 @@ const vincent = {
         return [...arr1.filter(v => !new Set(arr2).has(v)), ...arr2.filter(v => !new Set(
             arr1)
             .has(v))]
+    },
+    //判断是否微信浏览器内
+    isWeixin: () => {
+        var ua = navigator.userAgent.toLowerCase();
+        return ua.match(/MicroMessenger/i) == "micromessenger"
     }
 }
 

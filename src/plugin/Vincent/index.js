@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 11:53:14
+ * @LastEditTime: 2019-11-13 17:43:32
  * @description: 
  */
 
@@ -22,9 +22,8 @@ import '@/assets/style/sprites.css';
 
 // 组件
 import '@/components'
-//按需导入nutui组件
-// import { Dialog, Picker, Toast, ImagePicker } from '@nutui/nutui';
-import { PullRefresh, Popup, ImagePreview } from 'vant';
+import 'vant/lib/icon/local.css';
+import { PullRefresh, Popup, ImagePreview, Dialog } from 'vant';
 import util from '@/libs/util'
 
 
@@ -42,23 +41,16 @@ export default {
         // 构建时间
         Vue.prototype.$buildTime = process.env.VUE_APP_BUILD_TIME
         // 当前环境是否来源于 APP
-        Vue.prototype.$isFromApp = navigator.userAgent.indexOf("healthsource-b2b-app") != -1;
+        Vue.prototype.$isFromApp = navigator.userAgent.indexOf("healthsource-b2b-app") != -1
+        //当前环境是否在微信内打开
+        // Vue.prototype.$isWeixin = navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == "micromessenger"
 
         //全局过滤器
         Object.keys(filters).forEach((key) => {
             Vue.filter(key, filters[key])
         })
-
-        //按需导入nui组件
-        // Dialog.install(Vue);
-        // Picker.install(Vue);
-        // Toast.install(Vue);
-        // ImagePicker.install(Vue);
-        // Object.keys(Skeleton).forEach((key) => {
-        //     Skeleton[key].install(Vue)
-        // })
         Vue.prototype.$toast = util.toast
-        Vue.use(PullRefresh).use(Popup).use(ImagePreview)
+        Vue.use(PullRefresh).use(Popup).use(ImagePreview).use(Dialog)
 
     }
 }

@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:47:09
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 16:10:49
+ * @LastEditTime: 2019-11-12 17:42:48
  * @description: 
  -->
 <template>
@@ -16,8 +16,7 @@
             <p class="user-item-name">{{item.buyerName}}</p>
           </div>
           <div class="grade-item">
-            <!-- <img :src="star" class="grade-item-img" v-for="(i,k) in lists" :key="k" /> -->
-            <van-rate v-model="item.star" />
+            <i class="grade-item-img icon icon-rate" v-for="(i,k) in item.star" :key="i+k"></i>
           </div>
         </div>
         <p class="list-item-nav-right" v-if="showDate">{{item.createdAt|format('YYYY-MM-DD')}}</p>
@@ -35,7 +34,7 @@
 <script>
 // import { STARGRADE_ICON, STARUNGRADE_ICON, USER_ICON } from "@/utils/iconImg";
 
-import { Rate, ImagePreview } from "vant";
+import { ImagePreview } from "vant";
 export default {
   props: {
     showDate: {
@@ -47,9 +46,7 @@ export default {
       default: []
     }
   },
-  components: {
-    "van-rate": Rate
-  },
+  components: {},
   data() {
     return {
       lists: [1, 2, 3, 4, 5],
