@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:34
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 18:53:24
+ * @LastEditTime: 2019-11-14 14:14:07
  * @description: 
  */
 import header from "./header.vue";
@@ -75,7 +75,8 @@ export default {
             showSalesSwitch: false,//判断是否需要展示销售协议
             salesAgreementInfo: null,//销售协议相关信息
             showGuideShare: false, //分享引导弹层
-            hasLogin: 0 //是否登录   0未登录  1 登录
+            hasLogin: 0, //是否登录   0未登录  1 登录
+            productAd: null //轮播下广告
         }
     },
     components: {
@@ -170,6 +171,32 @@ export default {
             if (isAnyTtzVip && ttzVipLevel)
                 return productPackageRebates.filter(item => item.vipType == ttzVipLevel);
             return [];
+        },
+        //活动商品标识
+        promotionTitle() {
+            let { promotion } = this
+            let type = promotion && promotion.type || ''
+            let map = {
+                GROUPON: "火拼团购",
+                BARGAIN: "疯狂砍价",
+                FLASHSALE: "限时秒杀",
+                LIMITBUY: "限量抢购",
+                PRESELL: "定金预售"
+            };
+            return map[type] || "";
+        },
+        //活动商品描述  团团赚分享赚取补贴
+        promotionDes() {
+            let { promotion } = this
+            let type = promotion && promotion.type || ''
+            let map = {
+                GROUPON: "活动时间内低价抢购",
+                BARGAIN: "活动时间内低价抢购",
+                FLASHSALE: "活动时间内低价抢购",
+                LIMITBUY: "限量抢购",
+                PRESELL: "定金预售"
+            };
+            return map[type] || "";
         }
 
     },
@@ -504,7 +531,8 @@ export default {
                 item["spec"] = item["spec"].split(",").join("+");
                 return item;
             });
-
+            //轮播下广告图
+            this.productAd = response.data.productAd;
 
             this.showSalesSwitch = !response.data.productSalesAgreement && response.data.productSalesAgreementSwitch;
             if (this.showSalesSwitch) {

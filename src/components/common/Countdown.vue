@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:10:13
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 18:32:20
+ * @LastEditTime: 2019-11-14 11:16:46
  * @description: 
  -->
 <template>
@@ -16,17 +16,17 @@
 
     <span class="count-unit-text count-item " v-if="count.day1||count.day0">天</span>
 
-    <div class="count-item count-number row row-center" :style="{width:count.hour0?'66px':'44px'}">{{count.hour0||''}}{{count.hour1}}{{count.hour2}}</div>
+    <div class="count-item count-number row row-center" :class="[count.hour0?'.count-number-long':'']">{{count.hour0||''}}{{count.hour1}}{{count.hour2}}</div>
 
-    <span class="count-item count-unit-text">时</span>
+    <span class="count-item count-unit-text">:</span>
 
     <div class="count-item count-number row row-center">{{count.minute0}}{{count.minute1}}</div>
 
-    <span class="count-item count-unit-text">分</span>
+    <span class="count-item count-unit-text">:</span>
 
     <div class="count-item count-number row row-center">{{count.second0}}{{count.second1}}</div>
 
-    <span class="count-unit-text count-item ">秒</span>
+    <span class="count-unit-text count-item "></span>
   </div>
 
 </template>
@@ -106,7 +106,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang='less'>
 .rtb-count {
   /*flex: 1 1;*/
   /* height: .13px; */
@@ -125,23 +125,25 @@ export default {
 }
 .count-unit-text {
   color: #666;
+  margin: 0 5px;
 }
 .count-item {
-  margin: 0 0.015px;
   /* line-height: 1; */
   font-size: 20px;
-  color: #fc5a4f;
+  color: #fff;
 }
 .count-number {
   box-sizing: border-box;
-  min-width: 44px;
-  line-height: 44px;
+  min-width: 40px;
+  line-height: 56px;
   text-align: center;
-  height: 44px;
-  border-radius: 4px;
-  /* border: 1px solid #ccc; */
-  color: #fff;
-  background-color: #fc5a4f;
-  font-size: 30px;
+  height: 56px;
+  border-radius: 8px;
+  color: @themeColor;
+  background-color: #fff;
+  font-size: 28px;
+}
+.count-number-long {
+  min-width: 64px;
 }
 </style>

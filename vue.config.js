@@ -4,21 +4,20 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-12 16:28:47
+ * @LastEditTime: 2019-11-14 18:36:52
  * @description: 
  */
 //JS压缩
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 //用于开启gzip压缩的插件
 const CompressionPlugin = require('compression-webpack-plugin')
-// 引入插件
-const vConsolePlugin = require('vconsole-webpack-plugin');
 //引入雪碧图生成
 const SpritesmithPlugin = require('webpack-spritesmith');
+//Cli3 引入编译分析  添加包 vue add webpack-bundle-analyzer  执行 npm run build --report
 const templateFunction = function (data) {
     //雪碧图原始宽高 px
     let { width, height } = data.spritesheet
-    var shared = '.icon { background-image: url(I) }'
+    var shared = '.icon { background-image: url(I) ;display: inline-block;}'
         .replace('I', data.sprites[0].image);
 
     var perSprite = data.sprites.map(function (sprite) {
@@ -86,36 +85,11 @@ module.exports = {
                     test: /\.js$|\.html$|\.css/,//文件匹配名
                     threshold: 10240,//对超过10K的数据进行压缩
                     deleteOriginalAssets: false // 是否删除原文件
-                })]
+                })
+                ]
             }
         }
-        // else {
-        //     return {
-        //         plugins: [
-        //             new SpritesmithPlugin({
-        //                 src: {
-        //                     cwd: path.resolve(__dirname, 'src/assets/images/sprites'),
-        //                     glob: '*.png'
-        //                 },
-        //                 target: {
-        //                     image: path.resolve(__dirname, '/src/assets/images/sprite/sprite.png'),
-        //                     css: path.resolve(__dirname, '/src/assets/style/sprite.css')
-        //                 },
-        //                 apiOptions: {
-        //                     cssImageRef: "../images/sprite/sprite.png"
-        //                 },
-        //                 customTemplates: {
-        //                     function_based_template: templateFunction
-        //                 },
-        //                 spritesmithOptions: {
-        //                     algorithm: "binary-tree",
-        //                     padding: 10
-        //                 },
-        //                 retina: '@2x'
-        //             })
-        //         ]
-        //     }
-        // }
+
     },
 
     css: {

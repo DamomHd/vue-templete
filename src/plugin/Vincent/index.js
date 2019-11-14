@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 17:43:32
+ * @LastEditTime: 2019-11-14 13:56:30
  * @description: 
  */
 
@@ -22,7 +22,6 @@ import '@/assets/style/sprites.css';
 
 // 组件
 import '@/components'
-import 'vant/lib/icon/local.css';
 import { PullRefresh, Popup, ImagePreview, Dialog } from 'vant';
 import util from '@/libs/util'
 

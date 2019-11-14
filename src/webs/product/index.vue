@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:29
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 18:02:23
+ * @LastEditTime: 2019-11-14 16:19:32
  * @description: 商品详情页
  -->
 <template>
@@ -24,43 +24,82 @@
           <div class="pro-hd-title presell-pay-time" v-if="promotion&&promotion.type=='PRESELL'&&product.presellVO.restStartAt!=null">
             <p>尾款支付时间：{{promotion.resetStart|format('YYYY/MM/DD HH:mm:ss')}} - {{promotion.resetEnd|format('YYYY/MM/DD HH:mm:ss')}}</p>
           </div>
-          <div class="pro-hd-title">
-            <span class="pro-hd-title-content">{{productObj.name}}<span v-if="promotion&&promotion.type=='PRESELL'" class="pro-hd-presell-date">{{promotion.shipMonth}}月{{promotion.shipDay}}号发货</span></span>
-          </div>
 
           <div class="pro-hd-top">
             <span class="pro-hd-top-flog">&yen;</span>
-            <span class="pro-hd-top-price" v-if="!promotion">{{productObj.marketPrice}}</span>
+            <span class="pro-hd-top-price" v-if="!promotion">{{productObj.marketPrice|moneyInt}}.<span class="pro-hd-top-flog">{{productObj.marketPrice|moneyFloat}}</span></span>
             <span class="pro-hd-top-price" v-if="promotion&&promotion.type=='LIMITBUY'">{{product.limitBuyVO.price|moneyTwo}}</span>
             <span class="pro-hd-top-price" v-if="promotion&&promotion.type=='FLASHSALE'">{{product.flashsaleVO.discount|moneyTwo}}</span>
             <span class="pro-hd-top-price" v-if="promotion&&promotion.type=='PRESELL'">{{productObj.marketPrice|moneyTwo}}</span>
             <span class="pro-hd-top-price" v-if="promotion&&promotion.type=='BARGAIN'">{{productObj.bargainVO.maxDiscount|moneyTwo}}</span>
             <span class="pro-hd-top-pv">{{isTwitter?'(PV'+productObj.pv+')':''}}</span>
           </div>
+          <div class="pro-hd-title">
+            <span class="pro-hd-title-content">{{productObj.name}}<span v-if="promotion&&promotion.type=='PRESELL'" class="pro-hd-presell-date">{{promotion.shipMonth}}月{{promotion.shipDay}}号发货</span></span>
+          </div>
 
           <div class="pro-hd-bom row row-between">
             <span class="pro-hd-bom-stock">库存：&nbsp;&nbsp;{{productObj.amount}}件</span>
             <span class="pro-hd-bom-sales">销量：&nbsp;&nbsp;{{productObj.sales}}件</span>
           </div>
+
+          <a v-if="productAd" class="product-advertising" :href="productAd.productUrl">
+            <img :src="productAd.imgUrl" alt="" class="row-img">
+          </a>
+        </div>
+
+        <div class="detail-item activity row row-start" v-if="promotion">
+          <span class="activity_title">促销</span>
+          <span class="activity_des text-center">{{promotionTitle}}</span>
+          <span class="activity_text">{{promotion.type!='LIMITBUY'? promotionDes:`每人限购${product.limitBuyVO.amount}盒`}}</span>
+        </div>
+
+        <div class="bargain-record-box" v-if="promotion&&promotion.type=='BARGAIN'">
+          <div class="detail-item bargain-record row row-between">
+            <div class="vc-font-bold">砍价记录</div>
+            <div v-if='product.bargainVO.histories.length != product.bargainVO.maxTimes'>
+              <span class="bargain-residue">剩余砍价次数：{{product.bargainVO.maxTimes - product.bargainVO.histories.length}}</span>
+              <a href="javascript:void(0)" class="bargain-invite-btn vc-font-bold" @click="showGuideShare=true">邀请好友砍价</a>
+            </div>
+            <div v-else>
+              <span class="bargain-residue">砍价次数已用完</span>
+            </div>
+          </div>
+
+          <div class="">
+            <p class="bargain-record_empty text-center" v-if="!product.bargainVO.histories.length">还没有砍价记录</p>
+            <template v-else>
+              <div class="bargin-record-item row row-between" v-for="item in product.bargainVO.histories" :key='item.id'>
+                <span class="vc-text-hidden">
+                  您的好友{{item.userName}}帮您 <span class="bargain-discount">砍价{{item.discount}}元</span>
+                </span>
+                <span class="bargain-residue">{{item.createdAt|format}}</span>
+              </div>
+            </template>
+
+          </div>
         </div>
 
         <!-- 评价 -->
         <div class="recommend-box" v-if="product.totalCommentsRecord">
-          <p class="recommend-nav">评价</p>
+          <div class="recommend-nav row row-between">
+            <span class="vc-font-bold">宝贝评价</span>
+            <span class="row row-center" @click="showAllEvaluate">共有{{product.totalCommentsRecord}}条评论 <i class="icon icon-more"></i> </span>
+          </div>
           <div v-if="product.totalCommentsRecord">
             <v-evaluate :info='commentsRecords'></v-evaluate>
             <p class="show-evaluate" @click="showAllEvaluate">查看全部{{product.totalCommentsRecord}}条评论</p>
           </div>
         </div>
         <!-- 套餐搭配 -->
-        <div class="recommend-box" v-if="collocationList.length">
-          <p class="recommend-nav">套餐搭配</p>
+        <!-- <div class="recommend-box" v-if="collocationList.length">
+          <p class="recommend-nav  row row-between vc-font-bold">套餐搭配</p>
           <v-package :images='collocationList' height='260'></v-package>
-        </div>
+        </div> -->
 
         <!-- 产品详情 -->
         <div class="detail-item">
-          <span class="detail-item-title">产品详情</span>
+          <span class="detail-item-title vc-font-bold">产品详情</span>
           <div v-if="videoList">
             <video v-for="e in videoList" :key="e" class="video-item" :src="e" controls object-fit='cover'></video>
           </div>
@@ -71,12 +110,12 @@
         </div>
 
         <div class="recommend-box" v-if="recommendList.length">
-          <p class="recommend-nav">别人还在看</p>
+          <p class="recommend-nav  row row-between vc-font-bold">别人还在看</p>
           <div class="recommend-container">
             <div class="recommend-item" hover-class='hover' @click="goNewPage(d.productId)" v-for="(d,i) in recommendList" :key="i">
               <img class="recommend-img" :src="d.img" alt="" mode='aspectFit' />
               <span class="recommend-title">{{d.name}}</span>
-              <div><span class="recommend-price">&yen;{{d.price}}</span><span class="recommend-amount">库存{{d.amount}}件</span></div>
+              <div class="row row-between"><span class="recommend-price">&yen;{{d.price|moneyTwo}}</span><span class="recommend-amount">库存{{d.amount}}件</span></div>
             </div>
           </div>
         </div>
@@ -111,9 +150,9 @@
                 <div class="pro-info">
                   <div class="pro-name">{{productObj.name}}</div>
                   <div>
-                    <span class="pro-money" v-if="!promotion||promotion.type!='PRESELL'">￥{{skusList[selectSkuIndex]['showPrice']}}</span>
-                    <span class="pro-money" v-else-if="promotion.presellType =='NORMAL'">￥{{skusList[selectSkuIndex]['presellPrice']}}(预售价)</span>
-                    <span class="pro-money" v-else-if="promotion.presellType =='DEPOSIT'">￥{{skusList[selectSkuIndex]['advancePrice']}}（定金）￥{{skusList[selectSkuIndex]['restPrice']}} （尾款）</span>
+                    <span class="pro-money" v-if="!promotion||promotion.type!='PRESELL'">&yen;{{skusList[selectSkuIndex]['showPrice']}}</span>
+                    <span class="pro-money" v-else-if="promotion.presellType =='NORMAL'">&yen;{{skusList[selectSkuIndex]['presellPrice']}}(预售价)</span>
+                    <span class="pro-money" v-else-if="promotion.presellType =='DEPOSIT'">&yen;{{skusList[selectSkuIndex]['advancePrice']}}(定金) &yen;{{skusList[selectSkuIndex]['restPrice']}}(尾款)</span>
 
                   </div>
                   <div v-if="limitAmount"> <span class="pro-money">{{'限购' + limitAmount + '件(已购' + (countBuy) + '件)'}}</span></div>
@@ -190,23 +229,23 @@
           </div>
         </div>
         <div class="row row-around" @click="sharingChannels">
-          <div class="share-btn">
+          <div class="share-btn col col-center">
             <div class="icon icon-share_wx"></div>
             <span>微信好友</span>
           </div>
-          <div class="share-btn">
+          <div class="share-btn col col-center">
             <div class="icon icon-share_fd"></div>
             <span>朋友圈</span>
           </div>
-          <div class="share-btn">
+          <div class="share-btn col col-center">
             <div class="icon icon-share_qq"></div>
             <span>QQ好友</span>
           </div>
-          <div class="share-btn">
+          <div class="share-btn col col-center">
             <div class="icon icon-share_qz"></div>
             <span>QQ空间</span>
           </div>
-          <div class="share-btn">
+          <div class="share-btn col col-center ">
             <div class="icon icon-share_url"></div>
             <span>复制链接</span>
           </div>
@@ -218,7 +257,8 @@
     </van-popup>
     <van-popup v-model="showGuideShare" position="top" overlay-class='share-overlay'>
       <div @click="showGuideShare=false">
-        <img src="../../assets/images/product/share_guide.png" alt="" class="share_guide_img">
+        <img v-if="!promotion" src="../../assets/images/product/share_guide.png" alt="" class="share_guide_img">
+        <img src="../../assets/images/product/share_bargain.png" alt="" class="share_guide_img" v-else>
       </div>
     </van-popup>
     <van-dialog overlay-class='sales-dialog' v-model="showSales" title="" :show-confirm-button='false'>
