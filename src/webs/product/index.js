@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:34
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-14 14:14:07
+ * @LastEditTime: 2019-11-25 18:01:53
  * @description: 
  */
 import header from "./header.vue";
@@ -14,7 +14,7 @@ import ttz from "./Ttz.vue";
 import cardDialog from "./Card.vue";
 import ttzArgeement from "./TtzArgeement.vue";
 import util from '@/plugin/Vincent/functions/index'
-import { mapActions, mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import {
     getProduct,
     getRecommend,
@@ -26,21 +26,23 @@ import {
     queryIsTtzVip,
     createVipUser,
     querySalesAgreement,
-    agreeSalesAgreement
+    agreeSalesAgreement,
+    getBarainShareUrl
 } from '@/api/product'
 import { GetUserInfo } from '@/api/login'
 import {
     GoodsAction,
     GoodsActionIcon,
-    GoodsActionButton,
-    ImagePreview
+    GoodsActionButton
 } from 'vant';
 import inputNumber from "@/components/common/InputNumber.vue";
 export default {
     name: 'productDetail',
     data() {
         return {
-            isLoading: false,
+            isIniting: true, //是否初始化加载中 控制骨架屏
+            isLoading: false, //是否在下拉刷新
+            isHandleSkuFromItem: false,//是否从标题下规格栏选择
             count: 0,
             showDrawer: false,
             iconList: {
@@ -49,7 +51,7 @@ export default {
             },
             mask: true,
             article: "",
-            swiperList: [],
+            swiperList: [],//轮播
             product: {},
             commentsRecords: [], //评价,
             skusList: [], //sku的组合
@@ -76,7 +78,20 @@ export default {
             salesAgreementInfo: null,//销售协议相关信息
             showGuideShare: false, //分享引导弹层
             hasLogin: 0, //是否登录   0未登录  1 登录
-            productAd: null //轮播下广告
+            productAd: null, //轮播下广告
+            isSellOut: false,//商品是否 售罄
+            shareUrl: '',//分享链接
+            activityGrouponId: '',//是否参与他人拼团
+            shareGuideImg: {
+                normal: require('../../assets/images/product/share_guide.png'),
+                bargain: require('../../assets/images/product/share_bargain.png'),
+                groupon: require('../../assets/images/product/share_groupon.png')
+            },
+            showMoveDot: [],
+            elLeft: 0,
+            elTop: 0,
+            showImagePreview: false,
+            imagePreviewList: []
         }
     },
     components: {
@@ -93,7 +108,12 @@ export default {
         "v-cardDialog": cardDialog
     },
     watch: {
-        selectSkuIndex: function (nVal, oVal) {
+        //监听路由变化
+        $route: {
+            handler: "pageInit", //监听触发的方法
+            immediate: true
+        },
+        selectSkuIndex: function (nVal) {
             let { skusList, product } = this;
             let sku = skusList[nVal];
             //设置当前sku的限购信息
@@ -128,11 +148,6 @@ export default {
             }
             this.countBuy = limitNumber - canBuy;
             this.limitAmount = limitNumber
-        },
-        isAnyTtzVip: function (nVal) {
-            if (nVal) {
-                let { ttzPromotion } = this
-            }
         }
     },
     mounted() {
@@ -142,10 +157,6 @@ export default {
         ...mapState('Vincent', {
             shareInfo: state => state.wxShare.info
         }),
-        productObj() {
-            let { product } = this;
-            return product;
-        },
         //商品详情搜索对应的视频标签
         videoList() {
             return this.article.match(
@@ -172,6 +183,20 @@ export default {
                 return productPackageRebates.filter(item => item.vipType == ttzVipLevel);
             return [];
         },
+        promotionVo() {
+            let { promotion, product } = this;
+            if (promotion) {
+                let map = {
+                    GROUPON: "grouponVO",
+                    BARGAIN: "bargainVO",
+                    FLASHSALE: "flashsaleVO",
+                    LIMITBUY: "limitBuyVO",
+                    PRESELL: "presellVO"
+                };
+                return product[map[promotion['type']]]
+            }
+            return null
+        },
         //活动商品标识
         promotionTitle() {
             let { promotion } = this
@@ -194,7 +219,7 @@ export default {
                 BARGAIN: "活动时间内低价抢购",
                 FLASHSALE: "活动时间内低价抢购",
                 LIMITBUY: "限量抢购",
-                PRESELL: "定金预售"
+                PRESELL: promotion.presellDes
             };
             return map[type] || "";
         }
@@ -202,13 +227,33 @@ export default {
     },
 
     methods: {
-        ...mapActions("Vincent/wxShare", ["resetShareInfo"]),
+        ...mapMutations("Vincent/wxShare", ["resetShareInfo"]),
         async login() {
             let res = await GetUserInfo({ loginName: 17625580369, password: '123456' })
             if (res.errorCode == 200) {
                 this.hasLogin = 1
             }
             this.fresh()
+        },
+        //获取砍价邀请好友链接
+        async inviteBargainShareUrl() {
+            let { product } = this;
+            let res = await getBarainShareUrl({ id: product.bargainVO.id })
+            if (res.errorCode == 200) {
+                let data = res.data;
+                let { productId, promotionId, currentSellerShopId, currentSellerId } = data;
+                let bargainDetailId = data.id;
+                var shareUrl = location.origin + "/p/promotion/share/" + productId
+                    + "?promotionId=" + promotionId + "&activityId="
+                    + bargainDetailId + "&currentSellerShopId=" + currentSellerShopId + "&currentSellerId=" + currentSellerId;
+                this.shareUrl = shareUrl
+
+                //重置分享信息  title: product.name, imgUrl: product.imgUrl, 
+                this.resetShareInfo({ link: shareUrl });
+
+                //邀请好友 
+                this.showGuideShare = true;
+            }
         },
         onRefresh() {
             // this.fresh()
@@ -231,38 +276,13 @@ export default {
             }
 
             window.location.href = '/shop#/evaluateDetail?productId=' + productId;
-            // const userInfo = getStorageSync("userInfo");
-            // if (!userInfo) {
-            //     showConfirm({
-            //         title: "登录提示",
-            //         content: "您尚未登录，是否前往登录呢？",
-            //         ok: () => {
-            //             let url = getPagesInfo();
-            //             wx.reLaunch({
-            //                 url: "/pages/login/main?fromUrl=" + url
-            //             });
-            //         },
-            //         cancel: () => { }
-            //     });
-            //     return;
-            // }
-            // wx.navigateTo({
-            //     url: "/pages/evaluateDetail/main?productId=" + this.product.id
-            // });
         },
 
         goNewPage(id) {
-            console.log(id)
-            this.$router.replace({
+            this.$router.push({
                 name: 'productDetail',
-                query: { id: id },
-                params: {
-                    time: new Date().getTime()
-                }
+                query: { id: id }
             })
-            // wx.navigateTo({
-            //     url: "/pages/product/main?id=" + id
-            // });
         },
         //判断当前团团赚商品选择的数量是否符合团团赚限购数量 
         isLimitFullForTtz() {
@@ -293,11 +313,9 @@ export default {
             }
             return true;
         },
+        //跳转购物车
         jumpCart() {
             this.$toast(String(this.$isFromApp))
-            console.log(1111)
-            // wx.switchTab({ url: "/pages/home/main" });
-            // console.log(this.$isFromApp)
             if (this.$isFromApp) {
                 try { window.goCart(); } catch (e) { }
                 try { window.purchase.goCart() } catch (e) { }
@@ -312,26 +330,54 @@ export default {
                 this.showSales = true;
                 return;
             }
-            if (!this.isAnyTtzVip) {
+            if (!this.isAnyTtzVip && this.product.ttzFlag) {
                 this.showTtzAgreement = true;
                 return;
             }
             this.orderType = 1;
             this.showDrawer = true;
-            // wx.switchTab({url:'/pages/cart/main'})
         },
-        //想买
-        wantBuy() {
+        //想买  isBuyForMarketPrice 是否原价购买 默认false
+        wantBuy({ isBuyForMarketPrice = false } = {}) {
+            let { promotion } = this;
             //判断是否需要展示销售协议
             if (this.showSalesSwitch) {
                 this.showSales = true;
                 return;
             }
-            if (!this.isAnyTtzVip) {
+            if (!this.isAnyTtzVip && this.product.ttzFlag) {
                 this.showTtzAgreement = true;
                 return;
             }
             this.orderType = 0;
+            //如果是拼团或者砍价 只能是单规格且数量不可改动 直接下单
+            if (promotion && (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN')) {
+                this.addProduct({ isBuyForMarketPrice: isBuyForMarketPrice });
+            }
+            else {
+                this.showDrawer = true;
+            }
+        },
+        //sku选择弹窗中直接加入购物车或者购买
+        submitSkuPopup(orderType) {
+            //判断是否需要展示销售协议
+            if (this.showSalesSwitch) {
+                this.showSales = true;
+                return;
+            }
+            if (!this.isAnyTtzVip && this.product.ttzFlag) {
+                this.showTtzAgreement = true;
+                return;
+            }
+            this.orderType = orderType;
+            this.addProduct();
+        },
+        //展示sku选择框  
+        showSkuPopup() {
+            //如果是拼团  砍价  只能是单规格不能选择规格 数量
+            let { promotion } = this;
+            if (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN') return;
+            this.isHandleSkuFromItem = true;
             this.showDrawer = true;
         },
         //预览sku图片
@@ -341,10 +387,8 @@ export default {
             skusList.map(item => {
                 data.push(item.imgUrl);
             });
-            ImagePreview({
-                images: data,
-            });
-
+            this.imagePreviewList = data
+            this.showImagePreview = true;
         },
         //改变购买数量
         setNumber(option) {
@@ -352,6 +396,7 @@ export default {
             let val = option.value;
             this.buyNumber = val;
         },
+        //选择规则 切换变化
         selectSku(skuIndex) {
             this.selectSkuIndex = skuIndex;
             this.buyNumber = 1;
@@ -381,24 +426,11 @@ export default {
                 this.$toast(res.moreInfo)
             }
         },
-        //加入购物车 1||购买 0
-        async addProduct() {
-            // const userInfo = getStorageSync("userInfo");
-            // if (!userInfo) {
-            //     showConfirm({
-            //         title: "登录提示",
-            //         content: "您尚未登录，是否前往登录呢？",
-            //         ok: () => {
-            //             let url = getPagesInfo();
-            //             wx.reLaunch({
-            //                 url: "/pages/login/main?fromUrl=" + url
-            //             });
-            //         },
-            //         cancel: () => { }
-            //     });
-            //     return;
-            // }
+        //加入购物车 1||购买 0   
+        //isBuyForMarketPrice  是否原价购买 true为原价购买
+        async addProduct({ isBuyForMarketPrice = false } = {}) {
             //判断当前商品是否超出限购
+            console.log(111)
             if (!this.isLimitFull) return;
             //判断团团赚是否不符合最大 最小起订量
             if (!this.isLimitFullForTtz()) return;
@@ -409,8 +441,7 @@ export default {
             let qty = this.buyNumber;
             //是否为复合商品，如果是跳转选择套餐
             let isBasicPro = this.product.combination;
-
-            let { shopId } = this;
+            let { shopId, activityGrouponId } = this;
             //加入购物车
             if (this.orderType) {
                 let data = {
@@ -418,38 +449,37 @@ export default {
                     productId: productId,
                     amount: qty,
                     shopOwnerId: shopId,
-                    type: "add"
+                    type: "addCart"
                 };
 
                 // 如果时限购 加上活动id
-                if (this.promotion && this.promotion.type == "LIMITBUY") {
+                if (this.promotion && !isBuyForMarketPrice) {
                     data["promotionId"] = this.promotion.id;
+                }
+                //路由携带该参数则为参加拼团活动
+                if (activityGrouponId) {
+                    data['activityGrouponId'] = activityGrouponId
                 }
                 //该商品为复合商品规格，需要选择对应sku
                 if (isBasicPro == 1) {
-                    let tmp = util.objToUrl(data);
                     //混批
                     if (mixBatch == 1) {
-                        wx.navigateTo({
-                            url:
-                                "/pages/productMixBatch/main?params=" + encodeURIComponent(tmp)
-                        });
+                        window.location.href = '/shop?route=productMixBatch&params=' + JSON.stringify(data)
                         //不混批
                     } else {
-                        wx.navigateTo({
-                            url:
-                                "/pages/productPackage/main?params=" + encodeURIComponent(tmp)
-                        });
+                        window.location.href = "/shop?route=productPackage&params=" + JSON.stringify(data);
                     }
                 } else {
-                    const response = await addCart(data);
+                    let response = await addCart(data);
                     if (response.errorCode == 200 && response.data) {
-                        showToast({ title: "加入购物车成功！" });
+                        this.showDrawer = false;
+                        //加入购物车动画
+                        this.showMoveDot = [...this.showMoveDot, true];
+                        this.$toast("加入购物车成功！");
                     } else {
-                        showToast({ title: "加入购物车失败！" });
+                        this.$toast(response.moreInfo);
                     }
                 }
-
                 //直接下单
             } else {
                 if (isBasicPro == 1) {
@@ -462,35 +492,32 @@ export default {
                         qty: qty
                     };
                     // 如果时限购 加上活动id
-                    if (this.promotion && this.promotion.type == "LIMITBUY") {
+                    if (this.promotion && !isBuyForMarketPrice) {
                         data["promotionId"] = this.promotion.id;
+                    }
+                    //路由携带该参数则为参加拼团活动
+                    if (activityGrouponId) {
+                        data['activityGrouponId'] = activityGrouponId
                     }
                     //混批
                     if (mixBatch == 1) {
-                        wx.navigateTo({
-                            url:
-                                "/pages/productMixBatch/main?params=" +
-                                encodeURIComponent(util.objToUrl(data))
-                        });
+                        window.location.href = '/shop?route=productMixBatch&params=' + JSON.stringify(data)
                         //不混批
                     } else {
-                        // wx.navigateTo({
-                        //     url:
-                        //         "/pages/productPackage/main?params=" +
-                        //         encodeURIComponent(util.objToUrl(data))
-                        // });
-                        window.location.href = '/cart/next?' + util.objToUrl(data)
+
+                        window.location.href = "/shop?route=productPackage&params=" + JSON.stringify(data);
                     }
                 } else {
                     let params = `skuId=${skuId}&shopId=${shopId}&qty=${qty}&productId=${productId}`;
                     // 如果时限购 加上活动id
-                    if (this.promotion && this.promotion.type == "LIMITBUY") {
+                    if (this.promotion && !isBuyForMarketPrice) {
                         params += `&promotionId=${this.promotion.id}`;
                     }
+                    //路由携带该参数则为参加拼团活动
+                    if (activityGrouponId) {
+                        params += `&activityGrouponId=${activityGrouponId}`;
+                    }
                     window.location.href = '/cart/next?' + params
-                    // wx.navigateTo({
-                    //     url: "/pages/orderConfirm/main?params=" + encodeURIComponent(params)
-                    // });
                 }
             }
         },
@@ -505,35 +532,48 @@ export default {
                     message: isCollection ? "取消收藏成功！" : "收藏成功！"
                 });
                 this.isCollection = !isCollection;
-            } else {
-                this.$toast({ title: res.moreInfo });
             }
         },
+        //复制链接
+        copyUrl() {
+            var Url2 = this.shareUrl;
+            var oInput = document.createElement('input');
+            oInput.value = Url2;
+            document.body.appendChild(oInput);
+            oInput.select(); // 选择对象
+            document.execCommand("Copy"); // 执行浏览器复制命令
+            oInput.className = 'oInput';
+            oInput.style.display = 'none';
+            this.$toast('复制链接成功')
+        },
+        //获取完商品数据后的初始化
         init(response) {
+            this.isIniting = false;
             this.commentsRecords = [];
-            this.swiperList = [];
             let _this = this;
-            response.data.product &&
-                response.data.product.imgs.map(item => {
-                    this.swiperList.push({
-                        imgUrl: `http://img.gaindewo.com/${item["img"]}`
-                    });
-                });
-            // this.swiperList = [...response.data.imgsList];
+            this.swiperList = response.data.imgsList.map(item => {
+                return {
+                    imgUrl: item,
+                    targetUrl: ''
+                }
+            })
             this.product = { ...response.data.product };
             this.isCollection = response.data.isCollection;
             this.ttzPromotion = response.data.ttzPromotion || null;
             this.article = this.product.fullText;
             this.isTwitter = response.data.isTwitter; //是否代理
-            this.hasLogin = response.data.login;//是否登录
+            this.hasLogin = response.data.login || 0;//是否登录
             this["shopId"] = response.data.shop.ownerId;
             this.skusList = this.product.skus.map(item => {
                 item["spec"] = item["spec"].split(",").join("+");
                 return item;
             });
+            this.shareUrl = response.data.shareUrl;
+            //重置分享信息
+            this.resetShareInfo({ title: this.product.name, imgUrl: this.product.imgUrl, link: response.data.shareUrl })
             //轮播下广告图
             this.productAd = response.data.productAd;
-
+            this.isSellOut = response.data.sellout;
             this.showSalesSwitch = !response.data.productSalesAgreement && response.data.productSalesAgreementSwitch;
             if (this.showSalesSwitch) {
                 //查询销售协议内容
@@ -555,13 +595,13 @@ export default {
                 let date = new Date(this.product.presellVO.presellShipAt);
                 this.promotion["shipMonth"] = date.getMonth() + 1;
                 this.promotion["shipDay"] = date.getDate();
-
+                this.promotion["presellDes"] = this.product.presellVO.presellDescription;
                 this.promotion["resetStart"] = this.product.presellVO.restStartAt;
                 this.promotion["resetEnd"] = this.product.presellVO.restEndAt;
             } else {
                 this.promotion = response.data.promotion;
             }
-
+            //评论
             let commentsRecords = [...response.data.commentsRecords];
             commentsRecords.map((item, key) => {
                 item["createdAt"] = item["createdAt"];
@@ -576,8 +616,7 @@ export default {
                 this.currentSellerId = response.data.currentSellerId;
             }
 
-            //重置分享信息
-            this.resetShareInfo({ title: this.product.name, imgUrl: this.product.imgUrl, link: response.data.shareUrl })
+
         },
         //初始化团团转商品信息
         async initTtz() {
@@ -592,6 +631,11 @@ export default {
             if (res.errorCode == 200 && res.data) {
                 this.isAnyTtzVip = true;
                 this.initTtz()
+            }
+            else {
+                if (this.hasLogin) {
+                    this.showTtzAgreement = true
+                }
             }
         },
         //创建普通会员 如果是选择非普通会员进行下一步操作
@@ -623,8 +667,8 @@ export default {
         },
         //初始化商品数据
         async initProduct(params) {
+            this.isIniting = true;
             const response = await getProduct(params.id, params);
-
             if (response.errorCode == 200) {
                 this.init(response);
             } else if (response.errorCode == 302) {
@@ -645,6 +689,7 @@ export default {
                 this.collocationList = [...response.data];
             }
         },
+        //跳转首页
         jumpHome() {
             this.$toast(String(this.$isFromApp))
             if (!this.$isFromApp) {
@@ -701,18 +746,84 @@ export default {
                 }
             }
         },
+        //跳转套餐搭配
+        goPackage(id) {
+            let { hasLogin, isTwitter } = this;
+            var data = {
+                isLogin: hasLogin,
+                isTwitter: isTwitter,
+                id: id
+            }
+            window.location.href = "/shop?route=packagePro&params=" + JSON.stringify(data);
+        },
+        //
+        // addToCart() {
+        //     // 增加到购物车触发事件完成动画的触发
+        //     this.elLeft = event.target.getBoundingClientRect().left;
+        //     this.elTop = event.target.getBoundingClientRect().top;
+        //     this.showMoveDot = [...this.showMoveDot, true];
+        // },
+        //设置动画开始点
+        beforeEnter(el) {
+            // 设置transform值  触发按钮的动画起点  相对触发按钮的偏移量
+            // el.style.transform = `translate3d(${this.elLeft - 30}px,${this.elTop + 300}px , 0)`;
+            //设置起点为页面相对居中区域
+            el.style.transform = `translate3d(40vw,50vh,0)`;
+
+            // 设置透明度
+            el.style.opacity = 0;
+        },
+        //设置结束点
+        afterEnter(el) {
+            console.log('之后')
+            // 获取底部购物车徽标的位置
+            const badgePosition = document
+                .getElementById("buycar")
+                .getBoundingClientRect();
+            // 设置位移
+            el.style.transform = `translate3d(${badgePosition.left - 30}px,${badgePosition.top - 30}px,0)`
+            // 增加贝塞尔曲线  
+            // el.style.transition = 'transform .88s cubic-bezier(0.3, -0.25, 0.7, -0.15)';
+            el.style.transition = 'transform 0.88s cubic-bezier(0.2, -0.45, 1, -0.15)';
+
+            // el.style.transition = 'transform .88s linear';
+            this.showMoveDot = this.showMoveDot.map(item => false);
+            // 设置透明度
+            el.style.opacity = 1;
+            // 监听小球动画结束方法
+            el.addEventListener('transitionend', () => {
+                el.style.display = 'none';
+                this.listenInCart();
+            })
+            el.addEventListener('webkitAnimationEnd', () => {
+                el.style.display = 'none';
+                this.listenInCart();
+            })
+        },
+        //监听动画结束
+        listenInCart() {
+            // 拿到购物车的DOM添加class
+            document.getElementById("buycar").classList.add('moveToCart');
+            setTimeout(() => {
+                // 500毫秒后移除class
+                document.getElementById("buycar").classList.remove('moveToCart');
+            }, 500);
+        },
         //刷新执行的初始化函数
         fresh() {
-            if (this.$route.query.params) {
-                let params = util.formatParams(this.$route.query.params);
-                this.initProduct(params);
-                this.getRecommend(params.id);
-                this.getCollocation(params.id);
-            } else {
-                let id = this.$route.query.id;
-                this.initProduct({ id: id });
-                this.getRecommend(id);
-                this.getCollocation(id);
+            let id = this.$route.query.id;
+            let activityGrouponId = this.$route.query.activityGrouponId
+            this.activityGrouponId = (activityGrouponId && activityGrouponId != 'undefined' && activityGrouponId != 'null') ? this.$route.query.activityGrouponId : ''
+            this.initProduct({ id: id });
+            this.getRecommend(id);
+            this.getCollocation(id);
+        },
+        pageInit() {
+            if (this.$env == 'development') {
+                this.login()
+            }
+            else {
+                this.fresh();
             }
         },
         //处理邀请分享的参数问题
@@ -729,12 +840,7 @@ export default {
         }
     },
     created() {
-        if (this.$env == 'development') {
-            this.login()
-        }
-        else {
-            this.fresh();
-        }
+
         this.setShareInfo()
     }
 }

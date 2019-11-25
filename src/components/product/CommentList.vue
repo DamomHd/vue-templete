@@ -4,22 +4,26 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:47:09
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-12 17:42:48
+ * @LastEditTime: 2019-11-19 10:39:53
  * @description: 
  -->
 <template>
   <div>
     <div class="list-item" v-for="(item,key) in info" :key="key">
       <div class="list-item-nav">
-        <div class="list-item-nav-left">
-          <div class="user-item">
-            <p class="user-item-name">{{item.buyerName}}</p>
+        <div class="list-item-nav-left row row-between">
+          <div class="user-item row">
+            <img :src="item.userHeadImg" alt="买家头像" class="user-item-avatar">
+            <div class="user-item-name col col-start">
+              <p class="vc-line-block text-left">{{item.buyerName}}</p>
+              <p class="list-item-nav-right text-left" v-if="showDate">{{item.createdAt|format('YYYY-MM-DD')}}</p>
+            </div>
           </div>
           <div class="grade-item">
             <i class="grade-item-img icon icon-rate" v-for="(i,k) in item.star" :key="i+k"></i>
           </div>
         </div>
-        <p class="list-item-nav-right" v-if="showDate">{{item.createdAt|format('YYYY-MM-DD')}}</p>
+        <!-- <p class="list-item-nav-right" v-if="showDate">{{item.createdAt|format('YYYY-MM-DD')}}</p> -->
       </div>
       <p class="user-content">{{item.comment||'好评'}}</p>
       <div class="show-item row row-start">
@@ -27,6 +31,13 @@
         <img class="show-item-img" mode='aspectFill' :src="item.img2" v-if="item.img2" alt="" @click="previewImage(item,1)">
         <img class="show-item-img" mode='aspectFill' :src="item.img3" v-if="item.img3" alt="" @click="previewImage(item,2)">
         <!-- <image class="show-item-img" v-for="(it,ke) in lists" :src="userIcon" @click="text" :key="ke"></image> -->
+      </div>
+
+      <div class="service-content" v-if="item.commentsAdds.length">
+        <p class="service-title row"><i class="icon icon-service vc-line-block"></i> <span>客服回复</span> </p>
+        <p class="service-des">
+          {{item.commentsAdds[0].content}}
+        </p>
       </div>
     </div>
   </div>
@@ -81,9 +92,7 @@ export default {
   border-bottom-color: @lineColor;
   border-bottom-style: solid;
   border-bottom-width: 1px;
-  padding-bottom: 30px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 20px;
   box-sizing: border-box;
   width: 750px;
   &-nav {
@@ -100,19 +109,32 @@ export default {
     &-right {
       width: 200px;
       font-size: 24px;
-      text-align: right;
+      font-weight: 300;
+      // text-align: right;
       //   color: @color-text-caption;
     }
   }
 }
 .user-item {
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-right: 20px;
   box-sizing: border-box;
+  font-size: 0;
+  text-align: left;
   &-name {
     // color: @color-text-title;
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: bold;
+    & > p {
+      width: 100%;
+      padding: 5px 0;
+    }
+  }
+  &-avatar {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    object-fit: contain;
+    margin-right: 10px;
   }
 }
 .grade-item {
@@ -120,7 +142,7 @@ export default {
   flex-direction: row;
   justify-content: left;
   align-items: center;
-  flex: 1;
+  // flex: 1;
 
   &-img {
     width: 29px;
@@ -133,7 +155,16 @@ export default {
   font-size: 26px;
   color: @color-text-title;
   text-align: left;
-  line-height: 40px;
+  line-height: 39px;
+  max-height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  // /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  // /* autoprefixer: on */
+  word-wrap: break-word;
 }
 
 .show-item {
@@ -146,5 +177,34 @@ export default {
     margin-top: 10px;
     object-fit: contain;
   }
+}
+
+.service-content {
+  background-color: @pageBgColor;
+  border-radius: 8px;
+  font-size: 24px;
+  text-align: left;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+.service-title {
+  font-weight: bolder;
+  line-height: 50px;
+}
+.service-title > i {
+  margin-right: 10px;
+}
+.service-des {
+  line-height: 39px;
+  max-height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  // /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  // /* autoprefixer: on */
+  word-wrap: break-word;
 }
 </style>

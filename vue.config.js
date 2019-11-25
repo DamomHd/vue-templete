@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-14 18:36:52
+ * @LastEditTime: 2019-11-15 14:19:59
  * @description: 
  */
 //JS压缩
@@ -17,7 +17,7 @@ const SpritesmithPlugin = require('webpack-spritesmith');
 const templateFunction = function (data) {
     //雪碧图原始宽高 px
     let { width, height } = data.spritesheet
-    var shared = '.icon { background-image: url(I) ;display: inline-block;}'
+    var shared = '.icon { background-image: url(I) ;}'
         .replace('I', data.sprites[0].image);
 
     var perSprite = data.sprites.map(function (sprite) {
@@ -104,8 +104,8 @@ module.exports = {
             //覆盖vant主题色
             less: {
                 modifyVars: {
-                    red: '#03a9f4',
-                    blue: '#3eaf7c',
+                    red: '#ea4452',
+                    blue: '#03a9f4',
                     orange: '#f08d49',
                     'text-color': '#111'
                 }

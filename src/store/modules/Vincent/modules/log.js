@@ -1,5 +1,14 @@
+/*
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-15 11:23:11
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-11-15 10:18:41
+ * @description: 
+ */
 import dayjs from 'dayjs'
-import { get } from 'lodash'
+// import { get } from 'lodash'
 import util from '@/libs/util.js'
 
 export default {
@@ -49,7 +58,7 @@ export default {
           // // 当前的 token
           // token: util.cookies.get('token'),
           // 当前地址
-          url: get(window, 'location.href', ''),
+          // url: get(window, 'location.href', ''),
           // 用户设置
           ...meta
         }

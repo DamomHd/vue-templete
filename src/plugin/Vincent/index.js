@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-14 13:56:30
+ * @LastEditTime: 2019-11-22 17:36:33
  * @description: 
  */
 
@@ -24,6 +24,8 @@ import '@/assets/style/sprites.css';
 import '@/components'
 import { PullRefresh, Popup, ImagePreview, Dialog } from 'vant';
 import util from '@/libs/util'
+import VueAwesomeSwiper from "vue-awesome-swiper";
+import "swiper/dist/css/swiper.css";
 
 
 export default {
@@ -50,6 +52,6 @@ export default {
         })
         Vue.prototype.$toast = util.toast
         Vue.use(PullRefresh).use(Popup).use(ImagePreview).use(Dialog)
-
+        Vue.use(VueAwesomeSwiper);
     }
 }

@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-05 15:09:42
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 14:57:22
+ * @LastEditTime: 2019-11-20 16:52:29
  * @description: 个人常用API
  */
 
@@ -247,6 +247,16 @@ const vincent = {
     isWeixin: () => {
         var ua = navigator.userAgent.toLowerCase();
         return ua.match(/MicroMessenger/i) == "micromessenger"
+    },
+    copyUrl(text) {
+        var Url2 = text;
+        var oInput = document.createElement('input');
+        oInput.value = Url2;
+        document.body.appendChild(oInput);
+        oInput.select(); // 选择对象
+        document.execCommand("Copy"); // 执行浏览器复制命令
+        oInput.className = 'oInput';
+        oInput.style.display = 'none';
     }
 }
 

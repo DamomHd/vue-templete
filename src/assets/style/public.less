@@ -27,6 +27,18 @@
 /* 分割线 */
 @lineColor:#eceff1;
 
+
+/* 骨架屏相关公共变量 */
+@skeleton-theme-color-r: 255;
+@skeleton-theme-color-g: 255;
+@skeleton-theme-color-b: 255;
+@skeleton-theme-color: rgb(
+  @skeleton-theme-color-r,
+  @skeleton-theme-color-g,
+  @skeleton-theme-color-b
+);
+@skeleton-fill-color: gray;
+
   /* 点击效果 */
 .hover:active{
     opacity: 0.6;
@@ -64,4 +76,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.vc-block{
+  display: block;
+}
+.vc-line-block{
+  display: inline-block;
 }

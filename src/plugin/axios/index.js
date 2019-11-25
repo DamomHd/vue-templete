@@ -4,14 +4,13 @@
  * @Author: hongda_huang
  * @Date: 2019-07-15 10:40:11
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-08 13:42:57
+ * @LastEditTime: 2019-11-21 17:38:54
  * @description: 
  */
 import store from '@/store'
 import axios from 'axios'
 import util from '@/libs/util'
 import qs from 'querystring'
-// import { Toast } from '@nutui/nutui';
 
 
 // 创建一个错误
@@ -43,7 +42,7 @@ function errorLog(error) {
     //     duration: 5 * 1000
     // })
     util.toast(error.message, {
-        duration: 5 * 1000,
+        duration: 20 * 1000,
     })
 }
 
@@ -61,7 +60,6 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
         // 在请求发送之前做一些处理
-        // console.log(config)
         // form
         if (!config.isJson && !config.isFile) {
             config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -75,15 +73,17 @@ service.interceptors.request.use(
         if (config.isJson) {
             config.headers['Content-Type'] = 'application/json;charset=utf-8'
         }
-
-        // if (config.url == '/v2/signin_check') {
-        //     config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-        // }
+        if (config.url.indexOf('/wechat/getJsapiSignature') != -1) {
+            config.headers['Content-Type'] = 'application/json;charset=utf-8'
+            // config.data = qs.parse(config.data)
+        }
         let loginMap = [
             // '/provider-auth-server/oauth/email',
             // '/provider-auth-server/oauth/mobile',
             '/oauth/token'
         ]
+        // console.log(config)
+
         let requestURL = config.url
         // 如果是登陆接口
         if (loginMap.includes(requestURL)) {
@@ -103,7 +103,7 @@ service.interceptors.request.use(
         /**
          * @description get请求 拼接url参数
          */
-        if (config.method === 'get') {
+        if (config.method === 'get' && config.data) {
             config.url += `?${config.data}`
         }
 
@@ -122,7 +122,9 @@ service.interceptors.response.use(
         // dataAxios 是 axios 返回数据中的 data
         const dataAxios = response.data
         // 这个状态码是和后端约定的
-        const { code } = dataAxios
+        const { errorCode: code } = dataAxios
+
+        console.log(code)
         // 根据 code 进行判断
         if (code === undefined) {
             // 如果没有 code 代表这不是项目后端开发的接口 比如可能是 D2Admin 请求最新版本
@@ -133,9 +135,27 @@ service.interceptors.response.use(
                 case 0:
                     // [ 示例 ] code === 0 代表没有错误
                     return dataAxios.data
+
+
+                case 200:
+                    return dataAxios;
+                case 302:
+                    return dataAxios;
+                //未登录
+                case 401:
+                    util.toast('请您先登录', {
+                        duration: 3000,
+                    })
+                    var goUrl = window.location.href;
+                    window.location.href = '/multiPlatLogin/toMultiPlatLogin?fromUrl=' + encodeURIComponent(goUrl);
+                    return dataAxios;
+
+
                 case 100200:
                     // [ 示例 ] code === 0 代表没有错误
                     return dataAxios.data
+
+
                 case 100401:
                     errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
                     //注销用户

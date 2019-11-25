@@ -1,10 +1,19 @@
+/*
+ * @Descripttion: Vincent
+ * @version: v1.0
+ * @Author: hongda_huang
+ * @Date: 2019-07-15 11:12:48
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2019-11-15 10:34:20
+ * @description: 
+ */
 const log = {}
 
 /**
  * @description 返回这个样式的颜色值
  * @param {String} type 样式名称 [ primary | success | warning | danger | text ]
  */
-function typeColor (type = 'default') {
+function typeColor(type = 'default') {
   let color = ''
   switch (type) {
     case 'default': color = '#35495E'; break
@@ -12,7 +21,7 @@ function typeColor (type = 'default') {
     case 'success': color = '#43B883'; break
     case 'warning': color = '#e6a23c'; break
     case 'danger': color = '#f56c6c'; break
-    default:; break
+    default: ; break
   }
   return color
 }
@@ -36,9 +45,7 @@ log.capsule = function (title, info, type = 'primary') {
  * @description 打印彩色文字
  */
 log.colorful = function (textArr) {
-  console.log(
-    `%c${textArr.map(t => t.text || '').join('%c')}`,
-    ...textArr.map(t => `color: ${typeColor(t.type)};`)
+  console.log(`%c${textArr.map(t => t.text || '').join('%c')}`, ...textArr.map(t => `color: ${typeColor(t.type)};`)
   )
 }
 

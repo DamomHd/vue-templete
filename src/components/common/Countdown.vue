@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:10:13
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-14 11:16:46
+ * @LastEditTime: 2019-11-19 10:07:21
  * @description: 
  -->
 <template>
@@ -135,7 +135,7 @@ export default {
 .count-number {
   box-sizing: border-box;
   min-width: 40px;
-  line-height: 56px;
+  line-height: 54px;
   text-align: center;
   height: 56px;
   border-radius: 8px;

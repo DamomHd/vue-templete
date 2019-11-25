@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-15 11:16:53
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 11:33:22
+ * @LastEditTime: 2019-11-21 10:55:40
  * @description: 
  */
 
@@ -35,8 +35,9 @@ export function GetUserInfo(data) {
  */
 export function getJsapiSignature(data) {
     return request({
-        url: '/wechat/getJsapiSignature',
+        url: `/wechat/getJsapiSignature`,
         method: 'get',
         data
+
     })
 }

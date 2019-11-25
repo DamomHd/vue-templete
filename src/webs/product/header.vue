@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:09:29
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-14 16:37:26
+ * @LastEditTime: 2019-11-22 10:42:56
  * @description: 
  -->
 <template>
@@ -14,51 +14,55 @@
         <p class="hd-txt text-center">{{title}}</p>
       </div>
       <div class="hd-lt-item row row-start">
-        <span class="price-tag">&yen;</span>
-        <span class="price-int">{{info.marketPrice|moneyInt}}.</span>
-        <span class="price-float">{{info.marketPrice|moneyFloat}}</span>
+        <span class="price-tag"><span class="bargain-title">{{type == 'BARGAIN'&&list.histories?'已砍至 ':''}}</span>&yen;</span>
+        <template v-if="type == 'BARGAIN'">
+
+          <span class="price-int">{{list.histories?bargainReduce:info.marketPrice|moneyInt}}.</span>
+          <span class="price-float">{{list.histories?bargainReduce:info.marketPrice|moneyFloat}}</span>
+        </template>
+        <template v-else-if="type == 'LIMITBUY'">
+          <span class="price-int">{{list.price|moneyInt}}.</span>
+          <span class="price-float">{{list.price|moneyFloat}}</span>
+        </template>
+        <template v-else-if="type == 'FLASHSALE'||type == 'GROUPON'">
+          <span class="price-int">{{list.discount|moneyInt}}.</span>
+          <span class="price-float">{{list.discount|moneyFloat}}</span>
+        </template>
+        <template v-else-if="type == 'PRESELL'">
+          <span class="price-int">{{list.presellPrice|moneyInt}}.</span>
+          <span class="price-float">{{list.presellPrice|moneyFloat}}</span>
+        </template>
+        <template v-else>
+          <span class="price-int">{{info.marketPrice|moneyInt}}.</span>
+          <span class="price-float">{{info.marketPrice|moneyFloat}}</span>
+        </template>
+
         <div class="price-des col col-center">
-          <p class="price-discount" :class="colorClass">省99元</p>
-          <p class="price-old">&yen;120.0</p>
+          <!-- <p class="price-discount" :class="colorClass">省99元</p> -->
+
+          <p class="price-bargain-max" v-if="type == 'BARGAIN'&&!list.histories">最低&yen;{{list.maxDiscount|moneyTwo}}</p>
+          <p class="price-old" v-else>&yen;{{info.marketPrice|moneyTwo}}</p>
         </div>
 
-        <span class="pv">PV:100</span>
+        <span class="pv" v-if="isTwitter">PV:{{info.pv}}</span>
       </div>
 
     </div>
     <div class="hd-item-rt row row-center">
       <span class="tag tag-limit" v-if="type=='LIMITBUY'">限购{{list.amount}}件</span>
-      <!-- <span class="tag tag-limit" v-else-if="type=='BARGAIN'">邀请好友帮我砍价</span> -->
-      <span class="tag tag-limit" v-else-if="type=='GROUPON'">2人拼</span>
-      <div v-else-if="type=='FLASHSALE'||type == 'BARGAIN'">
+      <div v-else>
         <p class="hd-rt-des">距结束还剩</p>
-        <count-down :isProductDetail='true' :endTime='list.validTo'></count-down>
+        <count-down :isProductDetail='true' :endTime="type=='PRESELL'?list.presellEndAt:list.validTo"></count-down>
       </div>
-      <count-down :isProductDetail='true' :endTime='list.presellEndAt' v-else-if="type=='PRESELL'"></count-down>
+      <div>
+      </div>
     </div>
-    <!-- <div class="hd-item row row-center">
-      <span class="hd-txt">{{title}}</span>
-        <span class="hd-dep" v-if="type=='LIMITBUY'">&yen;{{info.marketPrice|moneyTwo}}</span>
-        <span class="hd-dep" v-else-if="type=='GROUPON'">&yen;{{info.marketPrice|moneyTwo}}</span>
-        <span class="hd-dep" v-else-if="type=='BARGAIN'">&yen;{{info.marketPrice|moneyTwo}}</span>
-        <span class="hd-dep" v-else-if="type=='FLASHSALE'">&yen;{{info.marketPrice|moneyTwo}}</span>
-      </div>
-      <div class="hd-item hd-item-presell col col-center">
-        <span class="tag tag-presell col col-center" v-if="type=='PRESELL'">{{list.presellDescription}}</span>
-      </div>
-      <div class="hd-item row row-center">
-        <span class="tag tag-limit" v-if="type=='LIMITBUY'">限购{{list.amount}}件</span>
-        <span class="tag tag-limit" v-else-if="type=='BARGAIN'">邀请好友帮我砍价</span>
-        <span class="tag tag-limit" v-else-if="type=='GROUPON'">2人拼</span>
-        <count-down :isProductDetail='true' :endTime='list.validTo' v-else-if="type=='FLASHSALE'"></count-down>
-        <count-down :isProductDetail='true' :endTime='list.presellEndAt' v-else-if="type=='PRESELL'"></count-down>
-      </div> -->
   </div>
 </template>
 <script>
 import countDown from "@/components/common/Countdown.vue";
 export default {
-  props: ["info", "type"],
+  props: ["info", "type", "isTwitter"],
   data() {
     return {};
   },
@@ -97,6 +101,18 @@ export default {
         PRESELL: "presell"
       };
       return map[type] || "";
+    },
+    bargainReduce() {
+      let { type, info, list } = this;
+      if (type == "BARGAIN" && list.histories) {
+        return (
+          info.marketPrice -
+          list.histories.reduce((total, item) => {
+            return total + item.discount;
+          }, 0)
+        );
+      }
+      return 0;
     }
   },
   mounted() {},
@@ -124,17 +140,15 @@ export default {
     height: 100%;
   }
   &-txt {
-    width: 150px;
-    // padding: 2px 10px;
-
+    // width: 120px;
     box-sizing: border-box;
     border: 2px solid #fff;
     border-radius: 15px;
     font-size: 20px;
     font-weight: bold;
     color: #fff;
-    line-height: 30px;
     display: inline-block;
+    padding: 5px 15px;
   }
 }
 .flashsale {
@@ -154,8 +168,13 @@ export default {
   color: #e42347;
 }
 .presell {
-  background-color: @themeColor;
-  color: @themeColor;
+  background-color: #bf27b2;
+  color: #fff;
+}
+.price-bargain-max {
+  color: #fff600;
+  font-size: 24px;
+  margin-top: 10px;
 }
 .hd-lt-item {
   height: 50px;
@@ -167,6 +186,9 @@ export default {
 .price-tag,
 .price-float {
   font-size: 32px;
+}
+.bargain-title {
+  font-size: 24px;
 }
 .price-int {
   font-size: 64px;

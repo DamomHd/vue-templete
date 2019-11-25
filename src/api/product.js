@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 13:20:49
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-12 11:20:29
+ * @LastEditTime: 2019-11-21 14:09:37
  * @description: 
  */
 import request from '@/plugin/axios'
@@ -181,6 +181,21 @@ export function querySalesAgreement(data) {
 export function agreeSalesAgreement(data) {
     return request({
         url: '/v2/userAgreement/insert',
+        method: 'post',
+        data
+    })
+}
+/**
+ * @description:获取邀请分享地址 
+ * @param {productId} 
+ * @LastEditTime: 
+ * @return: 
+ * @LastEditors: vincent_Huanghd@126.com
+ * @Date: 2019-10-29 15:24:07
+ */
+export function getBarainShareUrl(data) {
+    return request({
+        url: '/v2/promotionBargain/start',
         method: 'post',
         data
     })

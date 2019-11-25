@@ -4,18 +4,17 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:41:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-12 17:43:01
+ * @LastEditTime: 2019-11-20 21:57:56
  * @description: 
  -->
 
 <template>
   <div class="container">
     <p>{{10|roundPrice}}</p>
-    <router-link :to="{path:'test',query:{id:'7okip71w'}}">{{' 测试     '|trim('AROUND')}}</router-link>
-    <div class="test icon icon-car">
+    <!-- <router-link :to="{path:'/',query:{id:'7okip71w'}}">{{' 测试     '|trim('AROUND')}}</router-link> -->
 
-    </div>
-    <a href="javascript:void(0)" class="css-item icon icon-car">CSS交互效果</a>
+    <p class="css-item hover">CSS交互效果</p>
+
   </div>
 
 </template>
@@ -41,22 +40,17 @@ export default {
   },
   components: {},
   methods: {
-    async init() {
-      this.$toast("提示信息");
-      this.a = this.list.filter(item => item.id > 2);
-      console.log(this.list.includes(item => item.id === 3));
-      let res = await GetUserInfo({
-        userName: "17625580369",
-        password: "123456"
-      });
-    },
-    imgMsg(val) {
-      console.log(val);
+    init() {
+      console.log("初始化");
     }
   },
-  created() {
-    this.init();
-  }
+  watch: {
+    $route: {
+      handler: "init",
+      immediate: true
+    }
+  },
+  created() {}
 };
 </script>
 <style lang="less" scoped>
@@ -75,8 +69,9 @@ export default {
   line-height: 100px;
   margin-top: 100px;
 }
-.css-item:hover {
-  opacity: 0.6;
+.css-item:active {
+  background-color: #fff;
+  color: @themeColor;
 }
 
 .test {

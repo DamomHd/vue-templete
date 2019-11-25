@@ -5,6 +5,9 @@
     // height: 100vh;
     background-color: @pageBgColor;
 }
+.van-goods-action{
+  z-index: 2;
+}
 .detail-content{
   color: #fff;
 }
@@ -14,7 +17,7 @@
   width: 750px;
 }
 .top-btn{
-  position: fixed;
+  position: absolute;
   right: 0;
   top:20px;
   z-index: 2;
@@ -35,9 +38,10 @@
       display: flex;
       flex-direction: row;
       justify-content: center;
-      align-items: center;
+      align-items: flex-end;
       padding-right: 20px;
       padding-top: 20px;
+      padding-bottom: 20px;
       &-flog {
         color: @themeColor;
         font-size: 32px;
@@ -80,23 +84,25 @@
       }
     }
     &-presell-date {
-      height: 40px;
-      background: rgba(252, 79, 79, 1);
+      // height: 40px;
+      color:#BF27B2 ;
       font-size: 28px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 1);
-      padding: 0 10px;
+     background-color: #FFDFFC;
+      padding: 10px 10px;
+      margin-top: 10px;
+      border-radius: 8px;
     }
     &-title {
       // margin-top: 20px;
       &-content {
         font-size: 36px;
         color: @color-text-title;
-        line-height: 40px;
+        line-height: 42px;
         text-align: left;
         // lines:2;
         overflow: hidden;
-        // height: 80px;
+        max-height: 80px;
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -228,13 +234,28 @@
       }
     }
   }
-  
+  .sku-current-title{
+    max-width: 450px;
+    line-height: 40px;
+  }
   /* 查看评论 */
   .show-evaluate {
     font-size: 28px;
     color: @color-text-secondary;
     text-align: center;
     line-height: 80px;
+    background-color: #fff;
+  }
+  .evaluate-item{
+    padding: 20px 0;
+    box-sizing: border-box;
+    border-top: 1px solid @lineColor;
+    background-color: #fff;
+
+  }
+  .empty-evaluate{
+    font-size:24px ;
+    color: #999;
   }
   
   .detail-item {
@@ -246,7 +267,7 @@
       font-size: 30px;
       color: @color-text-title;
       line-height: 80px;
-      text-align: center;
+      padding-left: 20px;
     }
   }
   .container{
@@ -291,6 +312,25 @@
       align-items: center;
       & > div {
         flex: 1;
+      }
+    }
+    &-confirm-btn{
+      height: 88px;
+      width: 702px;
+      font-size: 30px;
+      border-radius: 44px;
+      overflow: hidden;
+      margin: 0 auto;
+
+      &-item{
+        flex:1;
+        height: 88px;
+        line-height: 86px;
+        background-color: #000;
+        color: #fff;
+      }
+      &-item:last-child{
+        background-color: @themeColor;
       }
     }
     &-btn {
@@ -366,6 +406,7 @@
     margin-right: 30px;
     margin-bottom: 20px;
     border-radius: 10px;
+    
     &-active {
       color: #ffffff;
       background-color: @themeColor;
@@ -401,7 +442,7 @@
   }
   .recommend-box{
     margin-top: 20px;
-    background-color: #fff;
+
   }
   .recommend-item {
     width: 350px;
@@ -418,7 +459,7 @@
     padding:0 20px;
     height: 100px;
   
- 
+    background-color: #fff;
   }
   .recommend-title {
     width: 350px;
@@ -457,12 +498,23 @@
   }
   .presell-pay-time {
     font-size: 24px;
-  
     font-weight: 400;
-    color: rgba(252, 79, 79, 1);
+    color:#BF27B2;
     text-align: left;
+    line-height: 40px;
+    margin-bottom: 20px;
   }
 
+  .sellout-btn{
+    width:550px;
+    height:88px;
+    background:#DDDDDD;
+    border-radius:44px;
+    color: #999;
+  }
+  .sellout-btn span{
+    font-size: 32px;
+  }
   .van-popup{
     background-color: transparent;
   }
@@ -631,10 +683,10 @@
 
 
   // 砍价记录
-  .bargain-record-box{
+  .bargain-record-box,.groupon-box{
     background-color: #fff;
   }
-.detail-item.bargain-record{
+.detail-item.bargain-record,.detail-item.groupon-item{
   font-size: 30px;
   color: #555555;
   padding: 0 20px;
@@ -657,7 +709,7 @@
   border-bottom: 1px solid @lineColor;
 }
   
-.bargain-invite-btn{
+.bargain-invite-btn,.groupon-invite-btn{
   display: inline-block;
   // width:160px;
   height:48px;
@@ -673,4 +725,43 @@
 }
 .bargain-discount{
   color: @themeColor;
+}
+.groupon-invite-map{
+  overflow-x: auto;
+  padding: 20px 20px;
+  white-space: nowrap;
+}
+.groupon-invite-header{
+  width: 96px;
+  height: 96px;
+  display: inline-block;
+  margin-right: 40px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 100%;
+  background: transparent url('../../assets/images/product/groupon_user.png') 100%/cover no-repeat;
+}
+.groupon-invite-header::after{
+  display: inline-block;
+  content:'待邀';
+  padding: 5px;
+  bottom: 0;
+  position: absolute;
+  color:#fff;
+  font-size: 20px;
+  background-color: #DDD;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.groupon-invite-header.active::after{
+  content:'团长';
+  background-color: @themeColor;
+}
+.groupon-invite-header.other::after{
+  content:'';
+  background-color: @themeColor;
+  width: 0;
+  padding: 0;
 }

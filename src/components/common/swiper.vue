@@ -4,15 +4,13 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 10:44:05
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 18:36:22
+ * @LastEditTime: 2019-11-22 17:36:50
  * @description: 
  -->
 <!-- The ref attr used to find the swiper instance -->
 <template>
   <swiper :options="swiperOption" ref="mySwiper">
-    <!-- slides -->
-    <!-- <swiper-slide v-for="(slide, index) in swiperSlides" :key="index">I'm Slide {{ slide }}</swiper-slide> -->
-    <swiper-slide v-for="item in swiperSlides" :key="item.imgUrl" @ontap="tap">
+    <swiper-slide v-for="item in info" :key="item.imgUrl">
       <div class="carousel_img-box" :class="parent+'_height'">
         <div @click="jump(item.targetUrl)" class="row row-center">
           <img :src="item.imgUrl" alt="" class="carousel_img">
@@ -25,13 +23,6 @@
 </template>
 
 <script>
-import Vue from "vue";
-import VueAwesomeSwiper from "vue-awesome-swiper";
-
-// require styles
-import "swiper/dist/css/swiper.css";
-
-Vue.use(VueAwesomeSwiper /* { default global options } */);
 export default {
   name: "carrousel",
   props: {
@@ -46,16 +37,18 @@ export default {
       default: ""
     }
   },
+
   data() {
     return {
       swiperOption: {
         autoplay: true, //可选选项，自动滑动
         // loop : true,
-        autoplayDisableOnInteraction: false,
+        // autoplayDisableOnInteraction: false,
         // some swiper options/callbacks
         // 所有的参数同 swiper 官方 api 参数
         pagination: {
-          el: ".swiper-pagination"
+          el: ".swiper-pagination",
+          type: "fraction"
         }
       },
       swiperSlides: [
@@ -74,8 +67,10 @@ export default {
   },
 
   methods: {
-    callback(e) {
-      console.log(e);
+    jump(url) {
+      if (url) {
+        window.location.href = url;
+      }
     },
     tap() {
       var tapTarget = event.target;
@@ -138,6 +133,9 @@ export default {
   width: 100%;
 }
 .carousel_point-container {
+}
+.swiper-pagination.swiper-pagination-fraction {
+  font-size: 24px;
 }
 </style>
 <style lang='less'>
