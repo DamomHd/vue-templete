@@ -2,8 +2,8 @@
     width: 750px;
   }
   //各个占位元素的位置
-  @skeleton-position: 570px 30px, 650px 30px, 20px 120px, 20px 200px, 20px 270px, 420px 270px, 20px 320px;
-  @skeleton-size: 60px 60px, 60px 60px, 406px 50px, 702px 40px, 300px 30px, 300px 30px,710px 100px;
+  @skeleton-position:  570px 30px, 650px 30px, 25px 120px,  25px 120px, 25px 850px, 25px 920px, 420px 920px, 25px 970px;
+  @skeleton-size: 60px 60px, 60px 60px, 700px 700px, 406px 50px, 700px 40px, 300px 30px, 300px 30px,700px 100px;
   .skeleton:empty {
     height: calc(100vh - 100px);
     background-repeat: no-repeat;
@@ -42,6 +42,8 @@
           @skeleton-fill-color 99%,
           transparent 0
         ),
+                //标题
+                linear-gradient(@skeleton-fill-color 100%, transparent 0),
         //标题
         linear-gradient(@skeleton-fill-color 50px, transparent 0),
             //标题

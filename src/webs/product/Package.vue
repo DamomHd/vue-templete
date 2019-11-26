@@ -1,7 +1,7 @@
 <!--
  * @Author: shenxsh
  * @Date: 2019-05-31 10:21:03
- * @LastEditTime: 2019-11-25 14:24:13
+ * @LastEditTime: 2019-11-26 15:33:20
  * @LastEditors: vincent_Huanghd@126.com
  * @Description: 常用的swiper移动端效果
  -->
@@ -39,7 +39,7 @@ export default {
     return {
       activeIndex: 0,
       swiperOption: {
-        notNextTick: true,
+        // notNextTick: true,
         autoplay: {
           // 自动播放
           delay: 1000,
@@ -47,6 +47,7 @@ export default {
           disableOnInteraction: false
         },
         slidesPerView: "auto",
+        init: false,
         centeredSlides: true,
         // spaceBetween: 20,
         loop: true, // 循环
@@ -72,7 +73,9 @@ export default {
       }
     };
   },
-  mounted() {},
+  mounted() {
+    this.initSwiper();
+  },
   methods: {
     prev() {
       this.mySwiper.slidePrev();
@@ -81,6 +84,12 @@ export default {
     next() {
       this.mySwiper.slideNext();
       this.activeIndex = this.mySwiper.realIndex;
+    },
+    initSwiper() {
+      this.$nextTick(async () => {
+        await this.mySwiper.init(); // 现在才初始化
+        await this.mySwiper.slideTo(this.activeIndex);
+      });
     }
   },
   computed: {

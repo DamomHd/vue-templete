@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:47:09
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-19 10:39:53
+ * @LastEditTime: 2019-11-26 17:52:06
  * @description: 
  -->
 <template>
@@ -39,13 +39,16 @@
           {{item.commentsAdds[0].content}}
         </p>
       </div>
+
+      <!-- 图片预览 -->
+      <van-image-preview v-model="show" :images="imagePreviewList" @change="changePreviewImage" :show-indicators='true' :close-on-popstate='true'>
+        <template v-slot:index>{{ imagePreviewIndex+1 }}/{{imagePreviewList.length}}</template>
+        <!-- <template v-slot:cover></template> -->
+      </van-image-preview>
     </div>
   </div>
 </template>
 <script>
-// import { STARGRADE_ICON, STARUNGRADE_ICON, USER_ICON } from "@/utils/iconImg";
-
-import { ImagePreview } from "vant";
 export default {
   props: {
     showDate: {
@@ -63,23 +66,23 @@ export default {
       lists: [1, 2, 3, 4, 5],
       star: "",
       unStart: "",
-      userIcon: ""
+      userIcon: "",
+      show: false,
+      imagePreviewList: [],
+      imagePreviewIndex: 0
     };
   },
   methods: {
-    text() {},
+    changePreviewImage(index) {
+      this.imagePreviewIndex = index;
+    },
     previewImage(item, index) {
       let data = [];
       item.img1 && data.push(item.img1);
       item.img2 && data.push(item.img2);
       item.img3 && data.push(item.img3);
-      ImagePreview({
-        images: data,
-        startPosition: index,
-        onClose() {
-          // do something
-        }
-      });
+      this.imagePreviewList = data;
+      this.show = true;
     }
   },
   created() {}
@@ -176,6 +179,7 @@ export default {
     height: 150px;
     margin-top: 10px;
     object-fit: contain;
+    margin-right: 10px;
   }
 }
 

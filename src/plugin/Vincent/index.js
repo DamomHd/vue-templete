@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-22 17:36:33
+ * @LastEditTime: 2019-11-26 18:50:20
  * @description: 
  */
 
@@ -26,7 +26,8 @@ import { PullRefresh, Popup, ImagePreview, Dialog } from 'vant';
 import util from '@/libs/util'
 import VueAwesomeSwiper from "vue-awesome-swiper";
 import "swiper/dist/css/swiper.css";
-
+import FastClick from 'fastclick'; // 引入插件
+FastClick.attach(document.body); // 使用 fastclick
 
 export default {
     install(Vue) {

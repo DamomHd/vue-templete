@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:34
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-25 18:01:53
+ * @LastEditTime: 2019-11-26 17:39:49
  * @description: 
  */
 import header from "./header.vue";
@@ -42,6 +42,7 @@ export default {
         return {
             isIniting: true, //是否初始化加载中 控制骨架屏
             isLoading: false, //是否在下拉刷新
+
             isHandleSkuFromItem: false,//是否从标题下规格栏选择
             count: 0,
             showDrawer: false,
@@ -91,7 +92,8 @@ export default {
             elLeft: 0,
             elTop: 0,
             showImagePreview: false,
-            imagePreviewList: []
+            imagePreviewList: [],
+            imagePreviewIndex: 0
         }
     },
     components: {
@@ -157,6 +159,13 @@ export default {
         ...mapState('Vincent', {
             shareInfo: state => state.wxShare.info
         }),
+        //是否禁止下拉刷新
+        isDisabledFresh() {
+            //某个弹窗打开就禁用刷新
+            let { isHandleSkuFromItem, showCardDialog, showDrawer, showGuideShare, showTtzAgreement, showShare, showSales } = this;
+            if (isHandleSkuFromItem || showCardDialog || showDrawer || showGuideShare || showTtzAgreement || showShare || showSales) return true
+            return false
+        },
         //商品详情搜索对应的视频标签
         videoList() {
             return this.article.match(
@@ -212,10 +221,10 @@ export default {
         },
         //活动商品描述  团团赚分享赚取补贴
         promotionDes() {
-            let { promotion } = this
+            let { promotion, product } = this
             let type = promotion && promotion.type || ''
             let map = {
-                GROUPON: "活动时间内低价抢购",
+                GROUPON: type == "GROUPON" ? `惊喜${product.grouponVO.numbers}人团` : '',
                 BARGAIN: "活动时间内低价抢购",
                 FLASHSALE: "活动时间内低价抢购",
                 LIMITBUY: "限量抢购",
@@ -255,6 +264,7 @@ export default {
                 this.showGuideShare = true;
             }
         },
+        //刷新
         onRefresh() {
             // this.fresh()
             setTimeout(() => {
@@ -263,11 +273,11 @@ export default {
                 this.count++;
             }, 500);
         },
+        //关闭弹窗
         closeDrawer() {
             this.showDrawer = !this.showDrawer;
         },
         showAllEvaluate() {
-
             var productId = this.product.id
             if (!this.hasLogin) {
                 var goUrl = window.location.href;
@@ -277,7 +287,7 @@ export default {
 
             window.location.href = '/shop#/evaluateDetail?productId=' + productId;
         },
-
+        //跳转新商品详情页
         goNewPage(id) {
             this.$router.push({
                 name: 'productDetail',
@@ -376,7 +386,7 @@ export default {
         showSkuPopup() {
             //如果是拼团  砍价  只能是单规格不能选择规格 数量
             let { promotion } = this;
-            if (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN') return;
+            if (promotion && (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN')) return;
             this.isHandleSkuFromItem = true;
             this.showDrawer = true;
         },
@@ -389,6 +399,10 @@ export default {
             });
             this.imagePreviewList = data
             this.showImagePreview = true;
+        },
+        //预览图切换 
+        changePreviewImage(index) {
+            this.imagePreviewIndex = index;
         },
         //改变购买数量
         setNumber(option) {
@@ -539,6 +553,7 @@ export default {
             var Url2 = this.shareUrl;
             var oInput = document.createElement('input');
             oInput.value = Url2;
+            oInput.readOnly = ''//只读
             document.body.appendChild(oInput);
             oInput.select(); // 选择对象
             document.execCommand("Copy"); // 执行浏览器复制命令
@@ -618,6 +633,7 @@ export default {
 
 
         },
+
         //初始化团团转商品信息
         async initTtz() {
             let res = await queryMyTtzVip();
@@ -691,7 +707,6 @@ export default {
         },
         //跳转首页
         jumpHome() {
-            this.$toast(String(this.$isFromApp))
             if (!this.$isFromApp) {
                 window.location.href = '/shop#/'
             }
@@ -702,7 +717,6 @@ export default {
         },
         //点击分享按钮 微信 朋友圈之类
         sharingChannels() {
-            this.$toast(String(this.$isFromApp))
             if (!this.$isFromApp) {
                 this.showShare = false;
                 this.showGuideShare = true;

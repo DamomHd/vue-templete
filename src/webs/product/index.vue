@@ -4,12 +4,12 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:29
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-25 18:26:59
+ * @LastEditTime: 2019-11-26 17:52:38
  * @description: 商品详情页
  -->
 <template>
   <div class="container">
-    <van-pull-refresh class="container-refresh" v-model="isLoading" @refresh="onRefresh">
+    <van-pull-refresh class="container-refresh" v-model="isLoading" @refresh="onRefresh" :disabled="isDisabledFresh">
       <transition name="fade">
         <div class="skeleton" v-show='isIniting'></div>
       </transition>
@@ -124,7 +124,11 @@
             </div>
           </div>
         </div>
-
+        <!-- 套餐搭配 -->
+        <div class="recommend-box" v-if="collocationList.length">
+          <p class="recommend-nav  row row-between vc-font-bold">套餐搭配({{collocationList.length}})</p>
+          <v-package :info='collocationList' height='260' @goPackage="goPackage"></v-package>
+        </div>
         <!-- 评价 -->
         <div class="recommend-box">
           <div class="recommend-nav row row-between">
@@ -139,11 +143,6 @@
             <i class="icon icon-empty_evaluate vc-line-block"></i><span class="empty-evaluate">还没有评价哦</span>
           </div>
         </div>
-        <!-- 套餐搭配 -->
-        <div class="recommend-box" v-if="collocationList">
-          <p class="recommend-nav  row row-between vc-font-bold">套餐搭配({{collocationList.length}})</p>
-          <v-package :info='collocationList' height='260' @goPackage="goPackage"></v-package>
-        </div>
 
         <!-- 产品详情 -->
         <div class="detail-item">
@@ -152,9 +151,7 @@
             <video v-for="e in videoList" :key="e" class="video-item" :src="e" controls object-fit='cover'></video>
           </div>
           <div v-html="article" class="detail-content">
-
           </div>
-          <!-- <wxParse :content="article" @preview="preview" @navigate="navigate" /> -->
         </div>
 
         <div class="recommend-box" v-if="recommendList.length">
@@ -167,24 +164,6 @@
             </div>
           </div>
         </div>
-        <!-- 底部菜单 -->
-        <!-- <div class="bom-item">
-        <div class="bom-item-item" @click="goHome">
-          <img :src="iconList.home" class="icon">
-          <p class="icon-title">首页</p>
-        </div>
-        <div class="bom-item-item" @click="addCart">
-          <img :src="iconList.cart" class="icon">
-          <p class="icon-title">加入购物车</p>
-        </div>
-        <div class="bom-item-item share-btn bom-title hover">
-          产品分享
-        </div>
-        <div class="bom-item-item buy-btn bom-title " @click="wantBuy">
-          想买
-        </div>
-      </div> -->
-
         <!-- 选择规格 -->
         <van-popup v-model="showDrawer" position="bottom" @closed='isHandleSkuFromItem=false'>
           <!--  v-if="mask"  -->
@@ -349,10 +328,8 @@
       </div>
     </transition>
     <!-- 图片预览 -->
-    <van-image-preview v-model="showImagePreview" :images="imagePreviewList">
-      <!-- <template v-slot:index> -->
-      <!-- <div>11111111111111111111111111</div> -->
-      <!-- </template> -->
+    <van-image-preview v-model="showImagePreview" :images="imagePreviewList" @change="changePreviewImage" :show-indicators='true' :close-on-popstate='true'>
+      <template v-slot:index>{{ imagePreviewIndex+1 }}/{{imagePreviewList.length}}</template>
     </van-image-preview>
   </div>
 </template>
@@ -404,57 +381,6 @@ export default proJs;
 }
 
 @keyframes mymove {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.8);
-  }
-  50% {
-    transform: scale(0.6);
-  }
-  75% {
-    transform: scale(0.4);
-  }
-  100% {
-    transform: scale(0.2);
-  }
-}
-@-moz-keyframes mymove {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.8);
-  }
-  50% {
-    transform: scale(0.6);
-  }
-  75% {
-    transform: scale(0.4);
-  }
-  100% {
-    transform: scale(0.2);
-  }
-}
-@-webkit-keyframes mymove {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.8);
-  }
-  50% {
-    transform: scale(0.6);
-  }
-  75% {
-    transform: scale(0.4);
-  }
-  100% {
-    transform: scale(0.2);
-  }
-}
-@-o-keyframes mymove {
   0% {
     transform: scale(1);
   }

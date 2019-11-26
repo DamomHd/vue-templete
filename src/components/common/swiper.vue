@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 10:44:05
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-22 17:36:50
+ * @LastEditTime: 2019-11-26 14:37:29
  * @description: 
  -->
 <!-- The ref attr used to find the swiper instance -->
@@ -49,7 +49,8 @@ export default {
         pagination: {
           el: ".swiper-pagination",
           type: "fraction"
-        }
+        },
+        init: false
       },
       swiperSlides: [
         {
@@ -97,6 +98,12 @@ export default {
       //       swiperTest.autoplay.start();
       //     }
       //   }
+    },
+    initSwiper() {
+      this.$nextTick(async () => {
+        await this.swiper.init(); // 现在才初始化
+        await this.swiper.slideTo(0);
+      });
     }
   },
   computed: {
@@ -107,6 +114,7 @@ export default {
   mounted() {
     // current swiper instance
     // 然后你就可以使用当前上下文内的swiper对象去做你想做的事了
+    this.initSwiper();
   }
 };
 </script>
