@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:34
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-25 21:09:26
+ * @LastEditTime : 2019-12-26 13:26:29
  * @description: 
  */
 import header from "./header.vue";
@@ -267,7 +267,7 @@ export default {
     methods: {
         ...mapMutations("Vincent/wxShare", ["resetShareInfo"]),
         async login() {
-            let res = await GetUserInfo({ loginName: 17625580369, password: '123456' })
+            let res = await GetUserInfo({ loginName: 15821527065, password: '123456' })
             if (res.errorCode == 200) {
                 this.hasLogin = 1
             }
@@ -736,7 +736,6 @@ export default {
         //获取完商品数据后的初始化
         init(response) {
             this.isIniting = false;
-            this.commentsRecords = [];
             let _this = this;
             this.product = { ...response.data.product };
             this.swiperList = this.product.imgs.map(item => {
@@ -746,14 +745,7 @@ export default {
                     videoUrl: item.videoUrl
                 }
             })
-            console.log(sessionStorage.getItem('cartCount'), 'cartCount')
-            if (sessionStorage.getItem('cartCount')) {
-                this.cartCount = sessionStorage.getItem('cartCount');
-                sessionStorage.removeItem('cartCount')
-            }
-            else {
-                this.cartCount = response.data.cartCount;
-            }
+            this.cartCount = response.data.cartCount;
             this.isCollection = response.data.isCollection;
             this.ttzPromotion = response.data.ttzPromotion || null;
             this.article = this.product.fullText;
@@ -798,7 +790,7 @@ export default {
                 this.promotion["resetEnd"] = this.product.presellVO.restEndAt;
             } else {
                 //限购活动 追加限购数量
-                if (response.data.promotion.type == 'LIMITBUY') {
+                if (response.data.promotion && response.data.promotion.type == 'LIMITBUY') {
                     response.data.promotion.limitBuyAmount = response.data.limitBuyAmount;
                 }
 

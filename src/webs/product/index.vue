@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:29
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-25 21:17:18
+ * @LastEditTime : 2019-12-26 13:53:13
  * @description: 商品详情页
  -->
 <template>
@@ -93,7 +93,7 @@
                 <span class="vc-text-hidden">
                   您的好友{{item.userName}}帮您 <span class="bargain-discount">砍价{{item.discount}}元</span>
                 </span>
-                <span class="bargain-residue">{{item.createdAt|format}}</span>
+                <span class="bargain-residue">{{item.createdAt|format('YYYY.MM.DD HH:mm:ss')}}</span>
               </div>
             </template>
           </div>
@@ -163,7 +163,7 @@
             <p class="recommend-nav  row row-between vc-font-bold">大家都在看</p>
             <div class="recommend-container">
               <div class="recommend-item" hover-class='hover' @click="goNewPage(d.productId)" v-for="(d,i) in recommendList" :key="i">
-                <div class="recommend-img row row-center"> <img alt="" :src="d.img" class="img" /></div>
+                <div class="recommend-img row row-center"> <img alt="" v-lazy="d.img" class="img" /></div>
                 <span class="recommend-title">{{d.name}}</span>
                 <div class="row row-between"><span class="recommend-price">&yen;{{d.price|moneyTwo}}</span><span class="recommend-amount">库存{{d.amount}}件</span></div>
               </div>
@@ -173,7 +173,8 @@
         <!-- 选择规格 -->
         <van-popup v-model="showDrawer" position="bottom" @closed='isHandleSkuFromItem=false'>
           <!--  v-if="mask"  -->
-          <i class="i-drawer-close icon icon-delete" @click="closeDrawer"></i>
+          <div class="i-drawer-close col col-center"><i class="icon icon-delete" @click="closeDrawer"></i></div>
+
           <div class="i-drawer-container">
             <div class="container-product" v-if="skusList.length">
               <div class="container-product-header">

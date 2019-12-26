@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:09:29
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-24 18:04:28
+ * @LastEditTime : 2019-12-26 13:50:32
  * @description: 
  -->
 <template>
@@ -189,13 +189,14 @@ export default {
 .price-tag,
 .price-float {
   font-size: 32px;
+  font-weight: bold;
 }
 .bargain-title {
   font-size: 24px;
   font-weight: bold;
 }
 .price-int {
-  font-size: 64px;
+  font-size: 56px;
   transform: translateY(5px);
 }
 .price-des {

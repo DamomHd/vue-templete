@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-12-23 15:51:32
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-23 17:21:44
+ * @LastEditTime : 2019-12-26 13:23:30
  * @description: 
  -->
 <template>
@@ -19,23 +19,26 @@ export default {
   data() {
     return {
       route: "",
-      formUrl: ""
+      fromUrl: ""
     };
   },
   components: {},
   methods: {
     refresh() {
-      let { route, formUrl } = this;
-      console.log(route);
+      let { route, fromUrl } = this;
       if (route) {
         route = JSON.parse(decodeURIComponent(route));
         this.$router.replace({ path: route.path, query: route.query });
+      } else if (fromUrl) {
+        location.replace(fromUrl);
+      } else {
+        location.replace("/shop");
       }
     }
   },
   created() {
     this.route = this.$route.query.route || "";
-    this.formUrl = this.$route.query.formUrl || "";
+    this.fromUrl = this.$route.query.fromUrl || "";
   }
 };
 </script>

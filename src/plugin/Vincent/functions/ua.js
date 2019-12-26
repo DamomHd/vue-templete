@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-12-24 18:21:18
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-25 20:18:26
+ * @LastEditTime : 2019-12-26 10:28:26
  * @description: 
  */
 const u = navigator.userAgent;
@@ -18,3 +18,4 @@ export const isWeixin = u.toLowerCase().match(/MicroMessenger/i) == "micromessen
 export const isFromApp = u.indexOf("healthsource-b2b-app") != -1
 
 export const isIosApp = isFromApp && isIos;
+export const isAndroidApp = isFromApp && isAndroid;

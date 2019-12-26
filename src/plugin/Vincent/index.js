@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-25 20:56:34
+ * @LastEditTime : 2019-12-26 13:30:32
  * @description: 
  */
 
@@ -59,7 +59,7 @@ export default {
         Vue.use(Lazyload, {
             lazyComponent: true,
             attempt: 1,
-            preLoad: 1,
+            preLoad: 0.5,
             loading: lazyloading,
             error: lazyloadImg
         });

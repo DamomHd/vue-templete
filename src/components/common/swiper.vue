@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:41:02
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-26 09:55:27
+ * @LastEditTime : 2019-12-26 11:48:36
  * @description: 
  -->
 
@@ -36,7 +36,7 @@ import VideoPlayer from "vue-video-player";
 import "vue-video-player/src/custom-theme.css";
 import "video.js/dist/video-js.css";
 import enableInlineVideo from "iphone-inline-video";
-import { isIosApp } from "@/plugin/Vincent/functions/ua";
+import { isIosApp, isAndroidApp } from "@/plugin/Vincent/functions/ua";
 Vue.use(VideoPlayer);
 
 export default {
@@ -60,8 +60,8 @@ export default {
       autoplay: 3000,
       playerOptions: {
         height: "360",
-        autoplay: false,
-        muted: true,
+        autoplay: false, //是否自动播放
+        muted: false, //是否静音
         language: "en",
         preload: "auto",
         // fullscreen: { options: { navigationUI: "hide" } },
@@ -146,12 +146,18 @@ export default {
       const playerBtn = document.querySelector(
         ".video-player.swiper-player .video-js .vjs-control-bar button>.vjs-icon-placeholder"
       );
+      const fullscreenBtn = document.querySelector(
+        ".video-player.swiper-player .video-js .vjs-control-bar .vjs-fullscreen-control"
+      );
 
       playerBtn.className = "vjs-icon-placeholder needsclick";
       if (isIosApp) {
         enableInlineVideo(playerVideo);
       }
-      // playerVideo && playerVideo.removeAttribute("x5-video-player-type");
+      if (isAndroidApp) {
+        fullscreenBtn.remove();
+      }
+      playerVideo && playerVideo.removeAttribute("x5-video-player-type");
       playerVideo && playerVideo.setAttribute("x-webkit-airplay", "allow");
       playerVideo &&
         playerVideo.setAttribute("x5-video-player-fullscreen", true);
@@ -269,7 +275,7 @@ export default {
   height: 60px;
 }
 .swiper-player /deep/ .video-js .vjs-big-play-button {
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%);
 }

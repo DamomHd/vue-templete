@@ -4,14 +4,14 @@
  * @Author: hongda_huang
  * @Date: 2019-07-15 10:40:11
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-23 16:21:25
+ * @LastEditTime : 2019-12-26 13:32:14
  * @description: 
  */
 import store from '@/store'
 import axios from 'axios'
 import util from '@/libs/util'
 import qs from 'querystring'
-
+import Router from '@/router'
 // 创建一个错误
 function errorCreate(msg) {
     const error = new Error(msg)
@@ -33,7 +33,14 @@ function errorLog(error) {
     if (process.env.NODE_ENV === 'development') {
         util.log.danger('>>>>>> Error >>>>>>')
         console.log(error)
+
     }
+    Router.replace({
+        path: '/error',
+        query: {
+            fromUrl: location.href
+        }
+    })
     // 显示提示
     // Message({
     //     message: error.message,
@@ -51,7 +58,7 @@ const service = axios.create({
     withCredentials: false,//设置避免set-cookie隐藏
     responseType: 'json',   // 响应数据格式
     responseEncoding: 'utf8',  // 响应数据编码
-    timeout: 5000 // 请求超时时间
+    timeout: 30000 // 请求超时时间
 })
 
 
@@ -76,27 +83,10 @@ service.interceptors.request.use(
             config.headers['Content-Type'] = 'application/json;charset=utf-8'
             // config.data = qs.parse(config.data)
         }
-        let loginMap = [
-            // '/provider-auth-server/oauth/email',
-            // '/provider-auth-server/oauth/mobile',
-            '/oauth/token'
-        ]
         // console.log(config)
 
         let requestURL = config.url
-        // 如果是登陆接口
-        if (loginMap.includes(requestURL)) {
-            config.headers['Authorization'] = `Basic ZHdjaGF0OjEyMzQ1Ng==`
-        } else {
-            const Authorization = util.cookies.get('Authorization')
-            const token = util.cookies.get('token')
-            if (Authorization) {
-                config.headers['Authorization'] = Authorization
-            }
-            if (token) {
-                config.headers['token'] = token
-            }
-        }
+
 
 
         /**
@@ -122,8 +112,6 @@ service.interceptors.response.use(
         const dataAxios = response.data
         // 这个状态码是和后端约定的
         const { errorCode: code } = dataAxios
-
-        console.log(code)
         // 根据 code 进行判断
         if (code === undefined) {
             // 如果没有 code 代表这不是项目后端开发的接口 比如可能是 D2Admin 请求最新版本
@@ -162,10 +150,7 @@ service.interceptors.response.use(
                     errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
                     break
                 default:
-                    util.toast(dataAxios.moreInfo || '网络异常', {
-                        // duration: 20 * 1000,
-                    })
-                    console.log('error')
+                    dataAxios.moreInfo && util.toast(dataAxios.moreInfo)
                     // 不是正确的 code
                     // errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
                     return dataAxios;

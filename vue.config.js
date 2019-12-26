@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-12-12 11:51:34
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-26 14:16:33
  * @description: 
  */
 //JS压缩
@@ -246,6 +246,10 @@ module.exports = {
         'style-resources-loader': {
             preProcessor: 'less',
             patterns: [path.resolve(__dirname, "./src/assets/style/public.less")]
+        },
+        //打包分析配置
+        'webpackBundleAnalyzer': {
+            openAnalyzer: false
         }
     }
 }

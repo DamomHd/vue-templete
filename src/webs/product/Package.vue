@@ -1,7 +1,7 @@
 <!--
  * @Author: shenxsh
  * @Date: 2019-05-31 10:21:03
- * @LastEditTime : 2019-12-25 16:59:12
+ * @LastEditTime : 2019-12-26 10:34:51
  * @LastEditors  : vincent_Huanghd@126.com
  * @Description: 常用的swiper移动端效果
  -->
@@ -49,7 +49,7 @@ export default {
     let _this = this;
     return {
       activeIndex: 0,
-      width: 0
+      width: document.body.clientWidth
     };
   },
 
@@ -77,9 +77,7 @@ export default {
     }
   },
   computed: {},
-  created() {
-    this.width = document.body.clientWidth;
-  }
+  created() {}
 };
 </script>
 <style lang="less" scoped>
