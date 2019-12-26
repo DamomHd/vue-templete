@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-26 14:16:33
+ * @LastEditTime : 2019-12-26 14:37:11
  * @description: 
  */
 //JS压缩
@@ -109,17 +109,7 @@ module.exports = {
                     orange: '#f08d49',
                     'text-color': '#111'
                 }
-            },
-            //配置移动端自适应rem  转移到postcss.config.js里
-            // postcss: {
-            //     plugins: [
-            //         autoprefixer(),
-            //         pxtorem({
-            //             rootValue: 75,
-            //             propList: ['*']
-            //         })
-            //     ]
-            // }
+            }
         },
 
     },
