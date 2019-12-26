@@ -1,147 +1,142 @@
 <!--
  * @Author: shenxsh
  * @Date: 2019-05-31 10:21:03
- * @LastEditTime: 2019-11-26 15:33:20
- * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 16:59:12
+ * @LastEditors  : vincent_Huanghd@126.com
  * @Description: 常用的swiper移动端效果
  -->
 <template>
   <div class="package-container">
-    <swiper class="box-container" :options="swiperOption" ref="mySwiper" v-if="info.length">
-      <swiper-slide v-for="(item, index) in info" :key="index" class="swiper-item">
-        <img :src="item.imgUrl" alt="" @click.stop="$emit('goPackage',item.id)">
-      </swiper-slide>
-      <!-- <div class="swiper-pagination" slot="pagination"></div> -->
-      <div class="swiper-button-prev swiper-button-white swiper-button-item" slot="button-prev" @click.stop="prev"></div>
-      <div class="swiper-button-next swiper-button-white swiper-button-item" slot="button-next" @click.stop="next"></div>
-      <!-- <div class="swiper-scrollbar" slot="scrollbar"></div> -->
-    </swiper>
-    <div v-if="info.length">
-      <p class="pageage-title">{{info[activeIndex]['name']}}</p>
-      <p class="pageage-content">最多省&yen;{{info[activeIndex]['discount']}}</p>
+    <van-swipe class="box-container" :loop="false" :width="width" :stop-propagation='false' :show-indicators='false' @change='changeSwiper' ref="packageSwiper">
+      <van-swipe-item v-for="(item,index) in info" :key="index" class="swiper-item" @click="handleClick">
+        <!-- <div>
+          
+        </div> -->
+        <img alt="" :src="item.imgUrl" class="swiper-image">
+        <!-- <div>{{index}}</div> -->
+      </van-swipe-item>
+    </van-swipe>
+    <div class="package-info">
+      <p class="package-title">{{info[activeIndex]['name']}}</p>
+      <p class="package-content">最多省&yen;{{info[activeIndex]['discount']}}</p>
     </div>
+    <i class="icon icon-left swiper-prev" @click="prev" v-show="info.length>1"></i>
+    <i class="icon icon-right swiper-next" @click="next" v-show="info.length>1"></i>
   </div>
 </template>
 
 <script>
+import { Swipe, SwipeItem } from "vant";
 export default {
-  name: "package",
+  name: "proPackage",
   props: {
     info: {
-      default: Array,
+      type: Array,
       default: () => {
-        [];
+        return [];
       }
+    },
+    height: {
+      type: [Number, String],
+      default: 750
     }
+  },
+  components: {
+    "van-swipe": Swipe,
+    "van-swipe-item": SwipeItem
   },
   data() {
     let _this = this;
     return {
       activeIndex: 0,
-      swiperOption: {
-        // notNextTick: true,
-        autoplay: {
-          // 自动播放
-          delay: 1000,
-          // stopOnLastSlide: false,
-          disableOnInteraction: false
-        },
-        slidesPerView: "auto",
-        init: false,
-        centeredSlides: true,
-        // spaceBetween: 20,
-        loop: true, // 循环
-        directionType: "horizontal", // 方向
-        // pagination: {
-        //   // 分页器
-        //   el: ".swiper-pagination",
-        //   type: "bullets",
-        //   clickable: true
-        // },
-        //小手掌抓取滑动
-        grabCursor: true,
-
-        navigation: {
-          // 左右按钮
-          nextEl: ".swiper-button-next",
-          prevEl: ".swiper-button-prev"
-        },
-        observer: true, // 启动动态检查器(OB/观众/观看者)，当改变swiper的样式（例如隐藏/显示）或者修改swiper的子元素时，自动初始化swiper。
-        observeParents: true, // 将observe应用于Swiper的父元素。当Swiper的父元素变化时，例如window.resize，Swiper更新。
-        setWrapperSize: true // Swiper使用flexbox布局(display: flex)，
-        // 开启这个设定会在Wrapper上添加等于slides相加的宽或高，在对flexbox布局的支持不是很好的浏览器中可能需要用到。
-      }
+      width: 0
     };
   },
-  mounted() {
-    this.initSwiper();
+
+  watch: {
+    // "mySwiper.activeIndex": "test"
   },
   methods: {
+    changeSwiper(index) {
+      this.activeIndex = index;
+    },
     prev() {
-      this.mySwiper.slidePrev();
-      this.activeIndex = this.mySwiper.realIndex;
+      let { activeIndex } = this;
+      this.$refs.packageSwiper.swipeTo(++activeIndex);
     },
     next() {
-      this.mySwiper.slideNext();
-      this.activeIndex = this.mySwiper.realIndex;
+      let { activeIndex } = this;
+      this.$refs.packageSwiper.swipeTo(--activeIndex);
     },
-    initSwiper() {
-      this.$nextTick(async () => {
-        await this.mySwiper.init(); // 现在才初始化
-        await this.mySwiper.slideTo(this.activeIndex);
-      });
+    handleItem(e) {
+      console.log(e);
+    },
+    handleClick(e) {
+      let { activeIndex } = this;
+      this.$emit("goPackage", this.info[activeIndex].id);
     }
   },
-  computed: {
-    mySwiper() {
-      return this.$refs.mySwiper.swiper;
-    }
+  computed: {},
+  created() {
+    this.width = document.body.clientWidth;
   }
 };
 </script>
 <style lang="less" scoped>
-.swiper-image {
-  width: 100%;
-  height: 270px;
-}
-/deep/ .swiper-slide.swiper-item {
-  width: 660px !important;
-  margin: 0 10px !important;
-}
-.swiper-slide.swiper-item img {
-  display: inline-block;
-  width: 100%;
-  max-height: 240px;
-  object-fit: contain;
-  cursor: pointer;
-}
-/deep/ .swiper-button-prev.swiper-button-item,
-/deep/.swiper-button-next.swiper-button-item {
-  background-color: rgba(000, 000, 000, 0.5);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-size: 20px;
-}
-/deep/ .swiper-button-prev.swiper-button-item {
-  left: 50px;
-}
-/deep/.swiper-button-next.swiper-button-item {
-  right: 50px;
-}
 .package-container {
-  background-color: #fff;
-  padding-bottom: 20px;
+  position: relative;
+  width: 750px;
 }
-.pageage-title {
+// .package-container /deep/ .van-swipe-item {
+//   width: 750px;
+// }
+// .package-swiper {
+//   width: 750px;
+// }
+.box-container {
+  background-color: #fff;
+}
+.swiper-item {
+  box-sizing: border-box;
+  // padding: 0 25px;
+}
+
+.swiper-image {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 700px;
+  height: 240px;
+  margin-left: 25px;
+  object-fit: contain;
+  font-size: 0;
+}
+.package-info {
+  padding: 20px 0;
+  background-color: #fff;
+  width: 750px;
+}
+.package-title {
   font-size: 30px;
   font-weight: 500;
-  color: rgba(85, 85, 85, 1);
+  color: #555555;
 }
-.pageage-content {
+
+.package-content {
   font-size: 24px;
   font-weight: 500;
   color: @themeColor;
-  line-height: 50px;
+  margin-top: 10px;
+}
+.swiper-prev {
+  position: absolute;
+  left: 50px;
+  top: 120px;
+  transform: translateY(-50%);
+}
+.swiper-next {
+  position: absolute;
+  right: 50px;
+  top: 120px;
+  transform: translateY(-50%);
 }
 </style>

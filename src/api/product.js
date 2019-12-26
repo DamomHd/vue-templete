@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 13:20:49
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-21 14:09:37
+ * @LastEditTime: 2019-12-11 18:20:09
  * @description: 
  */
 import request from '@/plugin/axios'
@@ -197,6 +197,21 @@ export function getBarainShareUrl(data) {
     return request({
         url: '/v2/promotionBargain/start',
         method: 'post',
+        data
+    })
+}
+
+
+/**
+ * @description: 获取储值卡商品的链接地址
+ * @param 
+ * @return: 
+ * @Date: 2019-12-11 18:19:51
+ */
+export function getCardProductUrl(data) {
+    return request({
+        url: '/v2/deposit/cardProductUrl',
+        method: 'get',
         data
     })
 }

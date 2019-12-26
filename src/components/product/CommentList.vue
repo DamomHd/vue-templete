@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:47:09
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-26 17:52:06
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 21:09:50
  * @description: 
  -->
 <template>
@@ -13,23 +13,23 @@
       <div class="list-item-nav">
         <div class="list-item-nav-left row row-between">
           <div class="user-item row">
-            <img :src="item.userHeadImg" alt="买家头像" class="user-item-avatar">
+            <img :src="item.userHeadImg||$avatar" alt="买家头像" class="user-item-avatar">
             <div class="user-item-name col col-start">
               <p class="vc-line-block text-left">{{item.buyerName}}</p>
-              <p class="list-item-nav-right text-left" v-if="showDate">{{item.createdAt|format('YYYY-MM-DD')}}</p>
+              <p class="list-item-nav-right text-left" v-if="showDate">{{item.createdAt|format('YYYY.MM.DD')}}</p>
             </div>
           </div>
           <div class="grade-item">
-            <i class="grade-item-img icon icon-rate" v-for="(i,k) in item.star" :key="i+k"></i>
+            <i class="grade-item-img icon " :class="i< item.star?'icon-rate':'icon-rate_dis'" v-for="(i,k) in 5" :key="k"></i>
           </div>
         </div>
         <!-- <p class="list-item-nav-right" v-if="showDate">{{item.createdAt|format('YYYY-MM-DD')}}</p> -->
       </div>
       <p class="user-content">{{item.comment||'好评'}}</p>
       <div class="show-item row row-start">
-        <img class="show-item-img" mode='aspectFill' :src="item.img1" v-if="item.img1" alt="" @click="previewImage(item,0)">
-        <img class="show-item-img" mode='aspectFill' :src="item.img2" v-if="item.img2" alt="" @click="previewImage(item,1)">
-        <img class="show-item-img" mode='aspectFill' :src="item.img3" v-if="item.img3" alt="" @click="previewImage(item,2)">
+        <img class="show-item-img" mode='aspectFill' v-if="item.img1" alt="" @click="previewImage(item,0)" :src="item.img1">
+        <img class="show-item-img" mode='aspectFill' v-if="item.img2" alt="" @click="previewImage(item,1)" :src="item.img2">
+        <img class="show-item-img" mode='aspectFill' v-if="item.img3" alt="" @click="previewImage(item,2)" :src="item.img3">
         <!-- <image class="show-item-img" v-for="(it,ke) in lists" :src="userIcon" @click="text" :key="ke"></image> -->
       </div>
 
@@ -41,9 +41,12 @@
       </div>
 
       <!-- 图片预览 -->
-      <van-image-preview v-model="show" :images="imagePreviewList" @change="changePreviewImage" :show-indicators='true' :close-on-popstate='true'>
+      <van-image-preview v-model="show" :images="imagePreviewList" @change="changePreviewImage" :close-on-popstate='true' class-name='vc-evaluate-image-preview'>
         <template v-slot:index>{{ imagePreviewIndex+1 }}/{{imagePreviewList.length}}</template>
-        <!-- <template v-slot:cover></template> -->
+        <template v-slot:cover>
+          <p class="evaluate-name text-left">@{{evaluateInfo.name}}</p>
+          <p class="evaluate-content text-left">{{evaluateInfo.content}}</p>
+        </template>
       </van-image-preview>
     </div>
   </div>
@@ -69,7 +72,11 @@ export default {
       userIcon: "",
       show: false,
       imagePreviewList: [],
-      imagePreviewIndex: 0
+      imagePreviewIndex: 0,
+      evaluateInfo: {
+        name: "",
+        content: ""
+      }
     };
   },
   methods: {
@@ -82,6 +89,10 @@ export default {
       item.img2 && data.push(item.img2);
       item.img3 && data.push(item.img3);
       this.imagePreviewList = data;
+      this.evaluateInfo = {
+        name: item.buyerName,
+        content: item.comment
+      };
       this.show = true;
     }
   },
@@ -150,7 +161,7 @@ export default {
   &-img {
     width: 29px;
     height: 29px;
-    margin-right: 20px;
+    margin-right: 7px;
   }
 }
 
@@ -178,7 +189,7 @@ export default {
     width: 150px;
     height: 150px;
     margin-top: 10px;
-    object-fit: contain;
+    object-fit: cover;
     margin-right: 10px;
   }
 }
@@ -202,6 +213,34 @@ export default {
 .service-des {
   line-height: 39px;
   max-height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  // /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  // /* autoprefixer: on */
+  word-wrap: break-word;
+}
+
+.vc-evaluate-image-preview /deep/ .van-image-preview__cover {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 24px;
+  min-height: 128px;
+  padding: 20px;
+  background: rgba(34, 34, 34, 0.4);
+  box-sizing: border-box;
+}
+.evaluate-name {
+  color: #fffefe;
+  line-height: 30px;
+}
+.evaluate-content {
+  color: #fff;
+  line-height: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

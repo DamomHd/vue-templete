@@ -3,15 +3,14 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-15 10:40:11
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-21 17:38:54
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-23 16:21:25
  * @description: 
  */
 import store from '@/store'
 import axios from 'axios'
 import util from '@/libs/util'
 import qs from 'querystring'
-
 
 // 创建一个错误
 function errorCreate(msg) {
@@ -41,9 +40,9 @@ function errorLog(error) {
     //     type: 'error',
     //     duration: 5 * 1000
     // })
-    util.toast(error.message, {
-        duration: 20 * 1000,
-    })
+    // util.toast(error.message, {
+    //     duration: 20 * 1000,
+    // })
 }
 
 // 创建一个 axios 实例
@@ -150,12 +149,9 @@ service.interceptors.response.use(
                     window.location.href = '/multiPlatLogin/toMultiPlatLogin?fromUrl=' + encodeURIComponent(goUrl);
                     return dataAxios;
 
-
                 case 100200:
                     // [ 示例 ] code === 0 代表没有错误
                     return dataAxios.data
-
-
                 case 100401:
                     errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
                     //注销用户
@@ -166,9 +162,13 @@ service.interceptors.response.use(
                     errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
                     break
                 default:
+                    util.toast(dataAxios.moreInfo || '网络异常', {
+                        // duration: 20 * 1000,
+                    })
+                    console.log('error')
                     // 不是正确的 code
-                    errorCreate(`${dataAxios.msg}: ${response.config.url}`)
-                    break
+                    // errorCreate(`[ code: xxx ] ${dataAxios.msg}: ${response.config.url}`)
+                    return dataAxios;
             }
         }
     },

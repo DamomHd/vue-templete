@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:10:13
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-19 10:07:21
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-23 15:26:17
  * @description: 
  -->
 <template>
@@ -126,6 +126,7 @@ export default {
 .count-unit-text {
   color: #666;
   margin: 0 5px;
+  font-weight: bold;
 }
 .count-item {
   /* line-height: 1; */

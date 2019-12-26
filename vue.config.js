@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-15 14:19:59
+ * @LastEditTime: 2019-12-12 11:51:34
  * @description: 
  */
 //JS压缩
@@ -105,7 +105,7 @@ module.exports = {
             less: {
                 modifyVars: {
                     red: '#ea4452',
-                    blue: '#03a9f4',
+                    blue: '#007AFF',
                     orange: '#f08d49',
                     'text-color': '#111'
                 }

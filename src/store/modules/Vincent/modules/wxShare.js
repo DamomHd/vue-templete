@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-11-13 10:12:27
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-21 14:22:16
+ * @LastEditTime: 2019-12-11 18:58:21
  * @description: 微信分享的相关信息
  */
 import { wechatAuth } from "@/plugin/Vincent/wechatConfig.js";
@@ -56,11 +56,11 @@ export default {
          * @param {Object} state vuex state
          */
         resetShareInfo(state, info) {
+            for (let key in info) {
+                state['info'][key] = info[key];
+            }
             //微信内获取签名
             if (navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == "micromessenger") {
-                for (let key in info) {
-                    state['info'][key] = info[key];
-                }
                 //获取分享签名 
                 wechatAuth();
             }

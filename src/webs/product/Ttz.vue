@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-11-08 11:03:03
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-12 14:01:51
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 21:19:33
  * @description: 
  -->
 <template>
@@ -106,6 +106,6 @@ export default {
   box-shadow: 0px 6px 12px 0px rgba(223, 54, 54, 0.33);
   border-radius: 18px;
   color: #fff;
-  padding: 3px 15px;
+  padding: 5px 15px;
 }
 </style>

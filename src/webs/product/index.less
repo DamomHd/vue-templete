@@ -16,15 +16,68 @@
   display: block;
   width: 750px;
 }
-.top-btn{
-  position: absolute;
+.nav-content{
+  position: fixed;
   right: 0;
-  top:20px;
+  top:0;
+  left: 0;
+  right: 0;
   z-index: 2;
+  height: 88px;
 }
-.top-btn>a{
+.nav-content.active{
+  animation:  show 1s linear  forwards;
+
+}
+@keyframes show {
+  to {
+    background-color: #F7F7F7;
+  }
+}
+.nav-content>a{
   display: inline-block;
-  margin-right: 20px;
+  position: absolute;
+  z-index: 100;
+}
+.nav-content>a:first-of-type{
+  right: 120px;
+}
+.nav-content>a:last-of-type{
+  right: 40px;
+}
+.nav-item{
+  width: 750px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  font-size: 32px;
+  padding: 0 240px;
+  box-sizing: border-box;
+}
+.nav-link{
+  color: #777777;
+  font-weight: 500;
+  display: inline-block;
+  width: 80px;
+}
+.nav-link.active{
+  color: #222;
+  font-weight: bold;
+  position: relative;
+}
+.nav-link.active::after{
+  content:'';
+  display: block;
+  width:56px;
+  height:4px;
+  background:@themeColor;
+  border-radius:2px;
+  position: absolute;
+  left: 12px;
+  bottom: -20px;
+}
+.nav-link>input[type=radio]{
+  display: none;
 }
 .detail-box {
     padding-bottom: 100px;
@@ -33,7 +86,7 @@
   }
   .pro-hd {
     background-color: #fff;
-    padding: 20px 30px;
+    padding: 20px;
     &-top {
       display: flex;
       flex-direction: row;
@@ -52,6 +105,7 @@
       &-price {
         color: @themeColor;
         font-size: 56px;
+        font-weight: bold;
       }
       &-pv {
         font-size: 28px;
@@ -98,15 +152,10 @@
       &-content {
         font-size: 36px;
         color: @color-text-title;
-        line-height: 42px;
+        line-height: 50px;
         text-align: left;
-        // lines:2;
-        overflow: hidden;
-        max-height: 80px;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        // max-height: 80px;
+        .ellipsis(2);
         font-weight: bold;
       }
     }
@@ -264,7 +313,7 @@
     font-size: 0;
     text-align: center;
     &-title {
-      font-size: 30px;
+      font-size: 28px;
       color: @color-text-title;
       line-height: 80px;
       padding-left: 20px;
@@ -273,7 +322,20 @@
   .container{
     height: 100vh;
   }
-  
+  #buycar{
+    position: relative;
+  }
+  #buycar::after{
+    // content: '';
+    // display: block;
+    // width: 16px;
+    // height: 16px;
+    // border-radius: 50%;
+    // background-color: @themeColor;
+    // position: absolute;
+    // right: 10px;
+    // top: 10px;
+  }
   /* 商品规格 */
   .container-product {
     background-color: #ffffff;
@@ -310,7 +372,7 @@
       box-sizing: border-box;
       flex-direction: row;
       align-items: center;
-      & > div {
+      & > div:last-child {
         flex: 1;
       }
     }
@@ -321,7 +383,9 @@
       border-radius: 44px;
       overflow: hidden;
       margin: 0 auto;
-
+      /deep/ .van-button{
+       flex: 1;
+      }
       &-item{
         flex:1;
         height: 88px;
@@ -334,7 +398,6 @@
       }
     }
     &-btn {
-      background-color: @themeColor;
       height: 88px;
       width: 702px;
       display: flex;
@@ -344,7 +407,10 @@
       color: #ffffff;
       font-size: 30px;
       margin: 0 auto;
-      border-radius: 44px;
+      /deep/ .van-button{
+        background-color: @themeColor;
+        width: 100%;
+      }
     }
   }
   .pro-sku-img {
@@ -363,7 +429,7 @@
     }
   }
   .pro-info {
-    width: 100%;
+    width: 750px;
     min-height: 120px;
     padding-left: 170px;
     box-sizing: border-box;
@@ -374,24 +440,33 @@
     padding-right: 50px;
     & > div {
       text-align: left;
-      height: 60px;
-      width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      line-height: 60px;
+      width: 450px;
     }
     & > .pro-name {
       font-size: 30px;
+      font-weight: bold;
       color: #333333;
+      .ellipsis(2);
+      line-height: 40px;
     }
     & .pro-money {
       font-size: 34px;
       color: @themeColor;
+      font-weight: bold;
+      margin-right: 20px;
     }
     & .pro-sku {
       font-size: 26px;
       color: #999999;
+    }
+    & .pro-limit-title{
+      font-size: 24px;
+      color: @themeColor;
+    }
+    & .pro-presell{
+      font-size: 30px;
+      color: #BF27B2;
+      font-weight: bold;
     }
   }
   
@@ -411,11 +486,17 @@
       color: #ffffff;
       background-color: @themeColor;
     }
+    &-empty{
+      color: #ffffff;
+      background-color: #777777;
+    }
   }
+  
   
   .pro-amount-title {
     font-size: 30px;
     color: #333333;
+    padding: 10px 0;
     & > span {
       font-size: 26px;
       color: #999999;
@@ -478,10 +559,10 @@
     box-sizing: border-box;
   }
   .recommend-img {
-    display: inline-block;
     width: 350px;
     height: 350px;
   }
+ 
   .recommend-price {
     color: #fc5a4f;
     font-size: 28px;
@@ -627,10 +708,15 @@
     margin-bottom: 20px;
   }
 
-// 包裹补贴部分
+  // 包裹补贴部分
   /deep/ .van-overlay.share-overlay{
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
+    // filter: blur(10px);
     color: #fff;
+  }
+
+  /deep/ .van-overlay.share-overlay.blod{
+    background-color: rgba(0, 0, 0, 0.9);
   }
   .share-ttz-package{
     width:702px;
@@ -667,17 +753,21 @@
     .activity_des{
       display: inline-block;
       width:120px;
-      height:40px;
-      line-height: 40px;
+   
       background:@themeColor;
       border-radius:8px;
       color: #fff;
       margin:  0 10px;
       font-size: 24px;
+      padding:10px 0;
     }
     .activity_text{
       font-size: 24px;
       color: #777777;
+      flex: 1;
+      text-align: left;
+      .ellipsis(2);
+      line-height: 30px;
     }
   }
 
@@ -695,10 +785,12 @@
   border-bottom: 1px solid @lineColor;
 }
 .bargain-record_empty{
-  line-height: 144px;
+  // line-height: 144px;
   color: #999;
 
   font-size: 24px;
+  padding: 20px 0;
+  box-sizing: border-box;
 }
 .bargin-record-item{
   font-size: 24px;
@@ -707,8 +799,11 @@
   height: 100px;
   box-sizing: border-box;
   border-bottom: 1px solid @lineColor;
-}
   
+}
+.bargin-record-item>span{
+  padding: 10px 0;
+}
 .bargain-invite-btn,.groupon-invite-btn{
   display: inline-block;
   // width:160px;

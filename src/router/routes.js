@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:31:50
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-20 10:41:58
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-23 17:29:15
  * @description: 
  */
 
@@ -14,6 +14,10 @@ const _import = require('@/libs/util.import.' + process.env.NODE_ENV)
 const frame = [
     {
         path: '/',
+        redirect: '/product'
+    },
+    {
+        path: '/product',
         name: 'productDetail',
         meta: {
             auth: true,
@@ -23,23 +27,37 @@ const frame = [
         component: _import('product/index.vue')
     },
     {
-        path: '/test',
-        name: 'test',
+        path: '/error',
+        name: 'error',
         meta: {
             auth: true,
-            title: '测试'
+            allowShare: false,
+            title: ''
         },
-        component: _import('index/index.vue')
+        component: _import('error/index.vue')
     },
     {
-        path: '/study',
-        name: 'study',
-        meta: {
-            auth: true,
-            title: '组件传参学习'
-        },
-        component: _import('study/component-communication/index')
+        path: '*',
+        redirect: '/error'
     }
+    // {
+    //     path: '/test',
+    //     name: 'test',
+    //     meta: {
+    //         auth: true,
+    //         title: '测试'
+    //     },
+    //     component: _import('index/index.vue')
+    // },
+    // {
+    //     path: '/study',
+    //     name: 'study',
+    //     meta: {
+    //         auth: true,
+    //         title: '组件传参学习'
+    //     },
+    //     component: _import('study/component-communication/index')
+    // }
 ]
 export default [
     ...frame

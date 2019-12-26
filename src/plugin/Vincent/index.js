@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-26 18:50:20
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 20:56:34
  * @description: 
  */
 
@@ -22,12 +22,12 @@ import '@/assets/style/sprites.css';
 
 // 组件
 import '@/components'
-import { PullRefresh, Popup, ImagePreview, Dialog } from 'vant';
+import { PullRefresh, Popup, ImagePreview, Dialog, Lazyload, Button } from 'vant';
 import util from '@/libs/util'
-import VueAwesomeSwiper from "vue-awesome-swiper";
-import "swiper/dist/css/swiper.css";
+import lazyloadImg from '@/assets/images/lazyload.png';
+import lazyloading from '@/assets/images/loading.gif';
 import FastClick from 'fastclick'; // 引入插件
-FastClick.attach(document.body); // 使用 fastclick
+FastClick.attach(document.body); // 使用 fastclick   需要禁用则添加class= 'needsclick'
 
 export default {
     install(Vue) {
@@ -44,15 +44,24 @@ export default {
         Vue.prototype.$buildTime = process.env.VUE_APP_BUILD_TIME
         // 当前环境是否来源于 APP
         Vue.prototype.$isFromApp = navigator.userAgent.indexOf("healthsource-b2b-app") != -1
-        //当前环境是否在微信内打开
-        // Vue.prototype.$isWeixin = navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == "micromessenger"
 
         //全局过滤器
         Object.keys(filters).forEach((key) => {
             Vue.filter(key, filters[key])
         })
         Vue.prototype.$toast = util.toast
-        Vue.use(PullRefresh).use(Popup).use(ImagePreview).use(Dialog)
-        Vue.use(VueAwesomeSwiper);
+        //未登录前的登录提醒
+        Vue.prototype.$goLogin = util.loginConfirm;
+        //用户默认头像
+        Vue.prototype.$avatar = 'http://qiniures.51shop.mobi/FsJ5nrFiLqeoEjng1-OmKtDqOslc'
+        Vue.use(PullRefresh).use(Popup).use(ImagePreview).use(Dialog).use(Button)
+        //懒加载
+        Vue.use(Lazyload, {
+            lazyComponent: true,
+            attempt: 1,
+            preLoad: 1,
+            loading: lazyloading,
+            error: lazyloadImg
+        });
     }
 }

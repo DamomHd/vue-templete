@@ -3,12 +3,12 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 16:26:29
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-15 10:33:23
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 17:08:35
  * @description: 
  */
 import cookies from './util.cookies'
-import { Toast } from 'vant';
+import { Toast, Dialog } from 'vant';
 
 import log from './util.log'
 const util = {
@@ -21,14 +21,30 @@ const util = {
  * @param {String} title 标题
  */
 util.title = function (titleText) {
-    const processTitle = process.env.VUE_APP_TITLE || 'Vincent'
-    window.document.title = `${processTitle}${titleText ? ` | ${titleText}` : ''}`
+    // const processTitle = process.env.VUE_APP_TITLE || 'Vincent'
+    // window.document.title = `${processTitle}${titleText ? ` | ${titleText}` : ''}`
+    window.document.title = titleText
 }
 
 util.toast = function (options) {
     Toast(options)
 }
 
+util.loginConfirm = function () {
+    Dialog.confirm({
+        message: '您当前尚未登录，是否先前往登录？',
+        width: '270px',
+        messageAlign: 'center',
+        className: 'vc-vant-confirm-modal',
+        confirmButtonText: '前往登录',
+    }).then(() => {
+        //前往登录
+        window.location.href = '/multiPlatLogin/toMultiPlatLogin?fromUrl=' + encodeURIComponent(location.href)
+        // on confirm
+    }).catch(() => {
+        // on cancel
+    });
+}
 
 
 /**

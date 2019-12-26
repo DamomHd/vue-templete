@@ -3,43 +3,44 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:09:29
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-22 10:42:56
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-24 18:04:28
  * @description: 
  -->
 <template>
   <div class="hd row row-center" :class="colorClass">
     <div class="hd-item-lt col col-center">
       <div class="hd-lt-item">
-        <p class="hd-txt text-center">{{title}}</p>
+        <p class="hd-txt text-center col col-center">
+          <span>{{title}}</span>
+        </p>
       </div>
       <div class="hd-lt-item row row-start">
-        <span class="price-tag"><span class="bargain-title">{{type == 'BARGAIN'&&list.histories?'已砍至 ':''}}</span>&yen;</span>
+        <span class="price-tag"><span class="bargain-title">{{type == 'BARGAIN'&&list.histories?'已砍至 ':''}}</span>&yen;&nbsp;</span>
         <template v-if="type == 'BARGAIN'">
 
-          <span class="price-int">{{list.histories?bargainReduce:info.marketPrice|moneyInt}}.</span>
-          <span class="price-float">{{list.histories?bargainReduce:info.marketPrice|moneyFloat}}</span>
+          <span class="price-int vc-font-bold">{{list.histories?bargainReduce:info.marketPrice|moneyInt}}.</span>
+          <span class="price-float vc-font-bold">{{list.histories?bargainReduce:info.marketPrice|moneyFloat}}</span>
         </template>
         <template v-else-if="type == 'LIMITBUY'">
-          <span class="price-int">{{list.price|moneyInt}}.</span>
-          <span class="price-float">{{list.price|moneyFloat}}</span>
+          <span class="price-int vc-font-bold">{{list.price|moneyInt}}.</span>
+          <span class="price-float vc-font-bold">{{list.price|moneyFloat}}</span>
         </template>
         <template v-else-if="type == 'FLASHSALE'||type == 'GROUPON'">
-          <span class="price-int">{{list.discount|moneyInt}}.</span>
-          <span class="price-float">{{list.discount|moneyFloat}}</span>
+          <span class="price-int vc-font-bold">{{list.discount|moneyInt}}.</span>
+          <span class="price-float vc-font-bold">{{list.discount|moneyFloat}}</span>
         </template>
         <template v-else-if="type == 'PRESELL'">
-          <span class="price-int">{{list.presellPrice|moneyInt}}.</span>
-          <span class="price-float">{{list.presellPrice|moneyFloat}}</span>
+          <span class="price-int vc-font-bold">{{list.presellPrice|moneyInt}}.</span>
+          <span class="price-float vc-font-bold">{{list.presellPrice|moneyFloat}}</span>
         </template>
         <template v-else>
-          <span class="price-int">{{info.marketPrice|moneyInt}}.</span>
-          <span class="price-float">{{info.marketPrice|moneyFloat}}</span>
+          <span class="price-int vc-font-bold">{{info.marketPrice|moneyInt}}.</span>
+          <span class="price-float vc-font-bold">{{info.marketPrice|moneyFloat}}</span>
         </template>
 
         <div class="price-des col col-center">
           <!-- <p class="price-discount" :class="colorClass">省99元</p> -->
-
           <p class="price-bargain-max" v-if="type == 'BARGAIN'&&!list.histories">最低&yen;{{list.maxDiscount|moneyTwo}}</p>
           <p class="price-old" v-else>&yen;{{info.marketPrice|moneyTwo}}</p>
         </div>
@@ -143,12 +144,13 @@ export default {
     // width: 120px;
     box-sizing: border-box;
     border: 2px solid #fff;
-    border-radius: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-    display: inline-block;
-    padding: 5px 15px;
+    width: 120px;
+    height: 36px;
+    border-radius: 18px;
+    & > span {
+      font-size: 20px;
+      color: #fff;
+    }
   }
 }
 .flashsale {
@@ -182,6 +184,7 @@ export default {
   text-align: left;
   color: #fff;
   font-size: 0;
+  align-items: flex-end;
 }
 .price-tag,
 .price-float {
@@ -189,16 +192,17 @@ export default {
 }
 .bargain-title {
   font-size: 24px;
+  font-weight: bold;
 }
 .price-int {
   font-size: 64px;
+  transform: translateY(5px);
 }
 .price-des {
   // display: inline-block;
   // height: 70px;
   font-size: 20px;
   min-width: 150px;
-  margin-bottom: 10px;
 }
 .price-discount {
   padding: 2px 10px;

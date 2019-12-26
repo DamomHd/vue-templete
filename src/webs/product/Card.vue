@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-11-08 14:12:07
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-11 15:52:12
+ * @LastEditTime: 2019-12-11 18:31:41
  * @description: 
  -->
 <template>
@@ -29,7 +29,7 @@
           </div>
         </div>
 
-        <a href="javascript:void(0)" class="card-buy-btn">购买储值卡</a>
+        <a href="javascript:void(0)" class="card-buy-btn" @click.stop="goCard">购买储值卡</a>
       </div>
       <div class="card-footer"></div>
       <div class="icon icon-card_close" @click="$emit('close')"></div>
@@ -46,6 +46,10 @@ export default {
     info: {
       type: Object,
       default: null
+    },
+    url: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -77,7 +81,16 @@ export default {
       this.showDialog = nVal;
     }
   },
-  methods: {},
+  methods: {
+    goCard() {
+      let { url } = this;
+      if (!url) {
+        this.$toast("暂无可购买储值卡");
+      } else {
+        window.location.href = url;
+      }
+    }
+  },
   created() {}
 };
 </script>

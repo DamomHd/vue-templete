@@ -3,24 +3,29 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:29
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-26 17:52:38
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 21:17:18
  * @description: 商品详情页
  -->
 <template>
   <div class="container">
     <van-pull-refresh class="container-refresh" v-model="isLoading" @refresh="onRefresh" :disabled="isDisabledFresh">
-      <transition name="fade">
-        <div class="skeleton" v-show='isIniting'></div>
-      </transition>
+      <!-- <transition name="fade"> -->
+      <div class="skeleton" v-show='isIniting'></div>
+      <!-- </transition> -->
       <div class="detail-box" v-show="!isIniting">
-        <div class="top-btn row row-end">
+        <div class="nav-content row row-center " :class="[headerActive?'':'active']">
           <!-- jumpHome -->
           <a class="icon icon-home" href="javascript:void(0)" @click="jumpHome"></a>
           <a class="icon icon-share" href="javascript:void(0)" @click="sharePd"></a>
+          <nav class="nav-item row row-around" v-show="!headerActive">
+            <!-- <input type="radio" :value='item.value' v-model="headerTabVal" /> -->
+            <label class="nav-link " :class="[headerTabVal == item.value?'active':'hide']" v-for="(item,index) in headerInfo" :key="index" @click="goAssignBlock(item.value)"><input type="radio" :value='item.value' v-model="headerTabVal" /> {{item.name}}</label>
+          </nav>
         </div>
+
         <!-- 轮播-->
-        <vc-swiper :info='swiperList' height='750'></vc-swiper>
+        <vc-swiper :info='swiperList' ref="PRODUCT"></vc-swiper>
         <v-head v-if="promotion" :type='promotion.type' :info='product' :isTwitter='isTwitter'></v-head>
         <!--  -->
 
@@ -41,20 +46,20 @@
           </div>
 
           <div class="pro-hd-bom row row-between" v-if="!promotion">
-            <span class="pro-hd-bom-stock">库存：&nbsp;&nbsp;{{product.amount}}件</span>
-            <span class="pro-hd-bom-sales">销量：&nbsp;&nbsp;{{product.sales}}件</span>
+            <span class="pro-hd-bom-stock">库存：{{product.amount}}</span>
+            <span class="pro-hd-bom-sales">销量：{{product.sales}}</span>
           </div>
           <div class="pro-hd-bom row row-between" v-else-if="promotion&&promotion.type=='LIMITBUY'">
-            <span class="pro-hd-bom-stock">库存：&nbsp;&nbsp;{{promotionVo.stock}}件</span>
-            <span class="pro-hd-bom-sales">销量：&nbsp;&nbsp;{{promotionVo.sales}}件</span>
+            <span class="pro-hd-bom-stock">库存：{{promotionVo.stock}}</span>
+            <span class="pro-hd-bom-sales">销量：{{promotionVo.sales}}</span>
           </div>
           <div class="pro-hd-bom row row-between" v-else-if="promotion&&promotion.type=='PRESELL'">
-            <span class="pro-hd-bom-stock">库存：&nbsp;&nbsp;{{product.amount}}件</span>
-            <span class="pro-hd-bom-sales">销量：&nbsp;&nbsp;{{product.sales}}件</span>
+            <span class="pro-hd-bom-stock">库存：{{product.amount}}</span>
+            <span class="pro-hd-bom-sales">销量：{{product.sales}}</span>
           </div>
           <div class="pro-hd-bom row row-between" v-else>
-            <span class="pro-hd-bom-stock">库存：&nbsp;&nbsp;{{promotionVo.amount}}件</span>
-            <span class="pro-hd-bom-sales">销量：&nbsp;&nbsp;{{promotionVo.sales}}件</span>
+            <span class="pro-hd-bom-stock">库存：{{promotionVo.amount}}</span>
+            <span class="pro-hd-bom-sales">销量：{{promotionVo.sales}}</span>
           </div>
           <!-- 储值卡广告 -->
           <a v-if="productAd" class="product-advertising" :href="productAd.productUrl">
@@ -64,16 +69,16 @@
         <!-- 团团赚 -->
         <v-ttz v-if="ttzPromotion" :info="ttzPromotion" :level='ttzVipLevel' @show='sharePd'></v-ttz>
         <!-- 促销标记 -->
-        <div class="detail-item activity row row-start" v-if="promotion||ttzPromotion">
+        <div class="detail-item activity row row-start" v-if="promotion||ttzPromotion||fullReduces">
           <span class="activity_title">促销</span>
-          <span class="activity_des text-center">{{promotion?promotionTitle:'团团赚'}}</span>
-          <span class="activity_text">{{promotion?(promotion.type!='LIMITBUY'? promotionDes:`每人限购${promotionVo.amount}盒`):'分享赚取补贴'}}</span>
+          <span class="activity_des text-center">{{promotion?promotionTitle:fullReduces?fullReduces['FULLCUT']?'满减':'满件':'团团赚'}}</span>
+          <span class="activity_text">{{promotion?(promotion.type!='LIMITBUY'? promotionDes:`每人限购${promotionVo.amount}盒`):fullReduces?fullReduces['FULLCUT']?fullReduces['FULLCUT'][0]['title']:fullReduces['FULLPIECES'][0]['title']:'分享赚取补贴'}}</span>
         </div>
         <!-- 砍价记录 -->
         <div class="bargain-record-box" v-if="promotion&&promotion.type=='BARGAIN'">
           <div class="detail-item bargain-record row row-between">
             <div class="vc-font-bold">砍价记录</div>
-            <div v-if='!promotionVo.histories||(promotionVo.histories.length||0 != promotionVo.maxTimes)'>
+            <div v-if='!promotionVo.histories||((promotionVo.histories.length||0) != promotionVo.maxTimes)'>
               <span class="bargain-residue">剩余砍价次数：{{promotionVo.maxTimes - (promotionVo.histories&&promotionVo.histories.length||0)}}</span>
               <a href="javascript:void(0)" class="bargain-invite-btn vc-font-bold" @click="inviteBargainShareUrl">邀请好友砍价</a>
             </div>
@@ -82,7 +87,7 @@
             </div>
           </div>
           <div class="" v-if="promotionVo.histories">
-            <p class="bargain-record_empty text-center" v-if="!promotionVo.histories.length">还没有砍价记录</p>
+            <p class="bargain-record_empty text-center row row-center" v-if="!promotionVo.histories.length"> <i class="icon icon-empty_cut vc-line-block"></i><label>还没有砍价记录</label></p>
             <template v-else>
               <div class="bargin-record-item row row-between" v-for="item in promotionVo.histories" :key='item.id'>
                 <span class="vc-text-hidden">
@@ -102,14 +107,13 @@
           <div class="detail-item groupon-item row row-between">
             <div class="vc-font-bold">我的拼团</div>
             <div>
-              <span class="bargain-residue">惊喜{{promotionVo.numbers}}人团</span>
+              <span class="bargain-residue">{{promotionVo.needNumbers==0?'拼团成功':`惊喜${promotionVo.numbers}人团`}}</span>
               <a v-if="promotionVo.needNumbers" href="javascript:void(0)" class="groupon-invite-btn vc-font-bold" @click="sharePd">邀请拼团</a>
             </div>
           </div>
           <div class="groupon-invite-map">
             <div class="groupon-invite-header" :class="[index===0?'active':'other']" :style="{backgroundImage:`url(${item.avatar})`,backgroundSize:'cover'}" v-for="(item,index) in promotionVo.users" :key="item.id"></div>
             <div class="groupon-invite-header" v-for="item in promotionVo.needNumbers" :key="'need'+item"></div>
-
           </div>
         </div>
 
@@ -119,7 +123,6 @@
             <span class="vc-font-bold">规格</span>
             <div class="row row-end">
               <span class="vc-text-hidden sku-current-title vc-line-block">{{skusList.length&&skusList[selectSkuIndex].spec||'请选择规格'}} </span>
-
               <i class="icon icon-more vc-line-block"></i>
             </div>
           </div>
@@ -127,17 +130,17 @@
         <!-- 套餐搭配 -->
         <div class="recommend-box" v-if="collocationList.length">
           <p class="recommend-nav  row row-between vc-font-bold">套餐搭配({{collocationList.length}})</p>
-          <v-package :info='collocationList' height='260' @goPackage="goPackage"></v-package>
+          <v-package v-if="collocationList.length" :info='collocationList' height='260' @goPackage="goPackage"></v-package>
         </div>
         <!-- 评价 -->
-        <div class="recommend-box">
+        <div class="recommend-box" ref="EVALUATE">
           <div class="recommend-nav row row-between">
             <span class="vc-font-bold">宝贝评价</span>
             <span class="row row-center" v-if="product.totalCommentsRecord" @click="showAllEvaluate">共有{{product.totalCommentsRecord}}条评论 <i class="icon icon-more"></i> </span>
           </div>
           <div v-if="product.totalCommentsRecord">
             <v-evaluate :info='commentsRecords'></v-evaluate>
-            <p class="show-evaluate" @click="showAllEvaluate">查看全部</p>
+            <!-- <p class="show-evaluate" @click="showAllEvaluate">查看全部</p> -->
           </div>
           <div v-else class="evaluate-item row row-center">
             <i class="icon icon-empty_evaluate vc-line-block"></i><span class="empty-evaluate">还没有评价哦</span>
@@ -145,25 +148,28 @@
         </div>
 
         <!-- 产品详情 -->
-        <div class="detail-item">
+        <div class="detail-item" ref="DETAIL">
           <p class="text-left detail-item-title vc-font-bold ">产品详情</p>
           <div v-if="videoList">
             <video v-for="e in videoList" :key="e" class="video-item" :src="e" controls object-fit='cover'></video>
           </div>
-          <div v-html="article" class="detail-content">
-          </div>
+          <lazy-component>
+            <div v-html="article" class="detail-content">
+            </div>
+          </lazy-component>
         </div>
-
-        <div class="recommend-box" v-if="recommendList.length">
-          <p class="recommend-nav  row row-between vc-font-bold">大家都在看</p>
-          <div class="recommend-container">
-            <div class="recommend-item" hover-class='hover' @click="goNewPage(d.productId)" v-for="(d,i) in recommendList" :key="i">
-              <img class="recommend-img" :src="d.img" alt="" mode='aspectFit' />
-              <span class="recommend-title">{{d.name}}</span>
-              <div class="row row-between"><span class="recommend-price">&yen;{{d.price|moneyTwo}}</span><span class="recommend-amount">库存{{d.amount}}件</span></div>
+        <lazy-component>
+          <div class="recommend-box" v-if="recommendList.length">
+            <p class="recommend-nav  row row-between vc-font-bold">大家都在看</p>
+            <div class="recommend-container">
+              <div class="recommend-item" hover-class='hover' @click="goNewPage(d.productId)" v-for="(d,i) in recommendList" :key="i">
+                <div class="recommend-img row row-center"> <img alt="" :src="d.img" class="img" /></div>
+                <span class="recommend-title">{{d.name}}</span>
+                <div class="row row-between"><span class="recommend-price">&yen;{{d.price|moneyTwo}}</span><span class="recommend-amount">库存{{d.amount}}件</span></div>
+              </div>
             </div>
           </div>
-        </div>
+        </lazy-component>
         <!-- 选择规格 -->
         <van-popup v-model="showDrawer" position="bottom" @closed='isHandleSkuFromItem=false'>
           <!--  v-if="mask"  -->
@@ -177,13 +183,16 @@
                 <div class="pro-info">
                   <div class="pro-name">{{product.name}}</div>
                   <div>
-                    <span class="pro-money" v-if="!promotion||promotion.type!='PRESELL'">&yen;{{skusList[selectSkuIndex]['showPrice']}}</span>
-                    <span class="pro-money" v-else-if="promotion.presellType =='NORMAL'">&yen;{{skusList[selectSkuIndex]['presellPrice']}}(预售价)</span>
-                    <span class="pro-money" v-else-if="promotion.presellType =='DEPOSIT'">&yen;{{skusList[selectSkuIndex]['advancePrice']}}(定金) &yen;{{skusList[selectSkuIndex]['restPrice']}}(尾款)</span>
-
+                    <span class="pro-presell" v-if="promotion&&promotion.presellType =='NORMAL'">&yen;{{skusList[selectSkuIndex]['presellPrice']}}(预售价)</span>
+                    <span class="pro-presell" v-else-if="promotion&&promotion.presellType =='DEPOSIT'">定金&nbsp;&yen;{{skusList[selectSkuIndex]['advancePrice']|moneyTwo}}&nbsp;&nbsp; 尾款&nbsp;&yen;{{skusList[selectSkuIndex]['restPrice']|moneyTwo}}</span>
                   </div>
-                  <div v-if="limitAmount"> <span class="pro-money">{{'限购' + limitAmount + '件(已购' + (countBuy) + '件)'}}</span></div>
-                  <div v-if="isAnyTtzVip && ttzVipLevel">
+                  <div>
+                    <span class="pro-money" v-if="!promotion||promotion.type!='PRESELL'">&yen;{{skusList[selectSkuIndex]['showPrice']}}</span>
+                    <span class="pro-sku text-line-through" v-if="promotion">&yen;{{product.marketPrice|moneyTwo}}</span>
+                    <span class="pro-sku" v-if="isTwitter">&nbsp;&nbsp;PV: {{skusList[selectSkuIndex]['showPv']}}</span>
+                  </div>
+                  <div v-if="limitAmount"> <span class="pro-limit-title">{{'限购' + limitAmount + '件(已购' + (countBuy) + '件)'}}</span></div>
+                  <div v-if="isAnyTtzVip && ttzVipLevel" class="row row-start">
                     <span class="ttz-dep">专享价</span>
                     <template v-if="ttzVipLevel=='ORDINARY'">
                       <span class="pro-money">{{(skusList[selectSkuIndex]['price'] - skusList[selectSkuIndex]['ordinaryCardRebate'])|moneyTwo}}</span><span class="ttz-card-name">普卡</span>
@@ -195,35 +204,39 @@
                       <span class="pro-money">{{(skusList[selectSkuIndex]['price'] - skusList[selectSkuIndex]['goldCardRebate'])|moneyTwo}}</span><span class="ttz-card-name">金卡</span>
                     </template>
                   </div>
-                  <div v-if="isTwitter">
-                    <span class="pro-sku">&nbsp;(PV {{skusList[selectSkuIndex]['showPv']}})</span>
-                  </div>
                   <div v-if="skusList[selectSkuIndex]['skuDepositCards'].length">
-                    <p class="icon icon-show_card_btn" @click="showCardDialog=true"></p>
+                    <p class="icon icon-show_card_btn" @click="showSkuDeposit"></p>
                   </div>
+                </div>
+              </div>
+              <div class="container-product-sku">
+                <div class="pro-amount-title" v-if="skusList.length>1">
+                  规格
                 </div>
               </div>
               <!-- <div > -->
               <div class="container-product-sku" v-if="skusList.length>1">
-                <span class="sku-item text-left" :class="[selectSkuIndex==skuIndex?'sku-item-active':'']" v-for="(skuItem,skuIndex) in skusList" :key="skuIndex" @click="selectSku(skuIndex)">{{skuItem.spec}}</span>
+                <span class="sku-item text-left" :class="[selectSkuIndex==skuIndex?'sku-item-active':'',skuItem.amount==0?'sku-item-empty':'']" v-for="(skuItem,skuIndex) in skusList" :key="skuIndex" @click="selectSku(skuIndex,skuItem.amount)">{{skuItem.spec}}</span>
                 <!-- </div> -->
               </div>
 
               <div class="container-product-amount" v-if="skusList.length">
                 <div class="pro-amount-title">
-                  数量
+                  购买数量
                   <span>(库存：{{skusList[selectSkuIndex]['amount']}}件)</span>
                 </div>
                 <div class="pro-amount-content">
-                  <input-number @changeNumber='setNumber' :max="skusList[selectSkuIndex]['amount']" :value="buyNumber" :min="1"></input-number>
+                  <van-stepper v-model="buyNumber" @change="setNumber" :min="1" :max="skusList[selectSkuIndex]['amount']" :disable-plus="buyNumber>=skusList[selectSkuIndex]['amount']" />
+                  <!-- <input-number @changeNumber='setNumber' :max="skusList[selectSkuIndex]['amount']" :value="buyNumber" :min="1"></input-number> -->
                 </div>
               </div>
-              <div class="container-product-btn" @click="addProduct" v-show="!isHandleSkuFromItem">
-                <div>确定</div>
+              <div class="container-product-btn" v-show="!isHandleSkuFromItem">
+                <!-- <div>确定</div> -->
+                <van-button :loading="isAddLoading" text="确定" round type="info" color="#BF272D" @click="addProduct" />
               </div>
               <div class="container-product-confirm-btn row" v-show="isHandleSkuFromItem">
-                <a href="javascript:void(0)" class="container-product-confirm-btn-item" @click="submitSkuPopup(1)">加入购物车</a>
-                <a href="javascript:void(0)" class="container-product-confirm-btn-item" @click="submitSkuPopup(0)">立即购买</a>
+                <van-button :loading="isAddLoading" text="加入购物车" type="info" color="#000" @click="submitSkuPopup(1)" />
+                <van-button text="立即购买" type="info" color="#BF272D" @click="submitSkuPopup(0)" />
               </div>
             </div>
           </div>
@@ -231,8 +244,8 @@
       </div>
     </van-pull-refresh>
     <van-goods-action safe-area-inset-bottom>
-      <van-goods-action-icon icon-class='icon icon-car' text="购物车" @click.native="jumpCart" id="buycar" />
-      <van-goods-action-icon :icon-class="isCollection?'icon icon-collect':'icon icon-collect_dis'" :text="isCollection?'已收藏':'收藏'" @click.native="updateCollectStatus" />
+      <van-goods-action-icon icon-class='icon icon-car' text="购物车" @click.native="jumpCart" :info="cartCount||''" id="buycar" />
+      <van-goods-action-icon :icon-class="isCollection?'icon icon-collect':'icon icon-collect_dis'" text="收藏" @click.native="updateCollectStatus" />
       <div class='sellout-btn row row-center hover' v-if='isSellOut'>
         <span>已售罄</span>
       </div>
@@ -248,9 +261,9 @@
     </van-goods-action>
     <!-- 团团赚协议 -->
     <v-ttzArgeement :show='showTtzAgreement' @createVipUser='createVipUser' @close='showTtzAgreement=false'></v-ttzArgeement>
-    <v-cardDialog :show='showCardDialog' :info="skusList[selectSkuIndex]" @close='showCardDialog=false'></v-cardDialog>
+    <v-cardDialog :show='showCardDialog' :info="skusList[selectSkuIndex]" :url='cardProductUrl' @close='showCardDialog=false'></v-cardDialog>
     <!-- 分享操作弹窗 -->
-    <van-popup v-model="showShare" position="bottom" overlay-class='share-overlay'>
+    <van-popup v-model="showShare" position="bottom" :overlay-class="isAndroid?'share-overlay blod':'share-overlay'">
       <div class="share-popup">
         <p class="share-title">分享至</p>
         <p class="share-content">好友通过您分享的链接可购买此商品</p>
@@ -331,6 +344,8 @@
     <van-image-preview v-model="showImagePreview" :images="imagePreviewList" @change="changePreviewImage" :show-indicators='true' :close-on-popstate='true'>
       <template v-slot:index>{{ imagePreviewIndex+1 }}/{{imagePreviewList.length}}</template>
     </van-image-preview>
+
+    <!-- 购买储值卡提示 -->
   </div>
 </template>
 <script>
@@ -340,7 +355,7 @@ export default proJs;
 <style scoped lang='less'>
 @import "./index.less";
 @import "./skeleton.less";
-
+@import "~@/assets/style/vant/index.less";
 .move_dot {
   position: fixed;
   z-index: 100;

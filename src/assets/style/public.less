@@ -37,8 +37,10 @@
   @skeleton-theme-color-g,
   @skeleton-theme-color-b
 );
-@skeleton-fill-color: gray;
+@skeleton-fill-color: #999;
 
+@lazyWidth:30px;
+@lazyHeight:30px;
   /* 点击效果 */
 .hover:active{
     opacity: 0.6;
@@ -54,7 +56,30 @@
   text-align: right;
 }
 
-
+/**
+* 溢出省略号
+* @param {rowCount} 行数
+*/
+.ellipsis(@rowCount:1) when (@rowCount=1){
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ellipsis(@rowCount:1) when (@rowCount>1){
+  overflow : hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: @rowCount;
+  // /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  // /* autoprefixer: on */
+  word-wrap:break-word;
+}
+.img{
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
 .row-img{
   display: inline-block;
   width: 100%;
@@ -62,6 +87,12 @@
 .col-img{
   display: inline-block;
   height: 100%;
+}
+.img-contain{
+  object-fit: contain;
+}
+.img-cover{
+  object-fit: cover;
 }
 .vc-fl{
   float: left;
@@ -84,3 +115,8 @@
 .vc-line-block{
   display: inline-block;
 }
+.text-line-through{
+  text-decoration: line-through;
+}
+
+

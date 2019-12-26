@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-10-29 17:20:46
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-07 18:51:19
+ * @LastEditTime: 2019-12-17 14:34:33
  * @description: 
  -->
 <template>
@@ -15,16 +15,14 @@
       <div class="i-input-number-minus" :class="[value <= min ? 'i-input-number-disabled' : '']" :data-disabled="value <= min" @click="handleMinus">
         <div class="i-input-number-minus-icon" :class="[value <= min ? 'i-input-number-minus-icon-disabled' : '']"></div>
       </div>
-      <input class="i-input-number-text" :class="[min >= max ? 'i-input-number-disabled' : '']" type="number" :value="value" @change="handleChange" :disabled="min >= max" @blur="handleBlur" />
+      <!--  @change="handleChange" -->
+      <input class="i-input-number-text" :class="[min >= max ? 'i-input-number-disabled' : '']" type="number" :value="value" :disabled="min >= max" @input="handleBlur" />
       <div class="i-input-number-plus" :class="[value >= max ? 'i-input-number-disabled' : '']" :data-disabled="value >= max" @click="handlePlus">
         <div class="i-input-number-plus-icon" :class="[value >= max ? 'i-input-number-plus-icon-disabled' : '']">
           <div class="i-input-number-plus-icon-two" :class="[value >= max ? 'i-input-number-plus-icon-two-disabled' : '']"></div>
-
         </div>
-
       </div>
     </div>
-
   </div>
 </template>
 
@@ -117,8 +115,8 @@ export default {
     },
 
     handleBlur(e) {
-      let { value } = this;
-
+      let value = e.target.value;
+      console.log(value);
       const { min, max } = this;
 
       if (!value) {
@@ -128,7 +126,7 @@ export default {
         return;
       }
 
-      value = +value;
+      // value = +value;
       if (value > max) {
         value = max;
       } else if (value < min) {

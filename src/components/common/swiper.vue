@@ -2,159 +2,295 @@
  * @Descripttion: Vincent
  * @version: v1.0
  * @Author: hongda_huang
- * @Date: 2019-10-29 10:44:05
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-26 14:37:29
+ * @Date: 2019-07-03 15:41:02
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-26 09:55:27
  * @description: 
  -->
-<!-- The ref attr used to find the swiper instance -->
+
 <template>
-  <swiper :options="swiperOption" ref="mySwiper">
-    <swiper-slide v-for="item in info" :key="item.imgUrl">
-      <div class="carousel_img-box" :class="parent+'_height'">
-        <div @click="jump(item.targetUrl)" class="row row-center">
-          <img :src="item.imgUrl" alt="" class="carousel_img">
+  <van-swipe @change="changeSwiper" :autoplay="info.length&&info[0]['videoUrl']?0:3000" :stop-propagation='false' class="swiper-top">
+    <van-swipe-item v-for="(item,index) in info" :key="index" class="swiper-item" @click="handleClick">
+      <template v-if="index==0&&item.videoUrl">
+        <!-- controls="controls"  -->
+        <!-- <video  id="swiperVideo" controls src="http://video.gaindewo.com/sv/2417fc69-16f124185d6/2417fc69-16f124185d6.mp4" :poster="item.imgUrl" x-webkit-airplay="true" x5-playsinline="true" webkit-playsinline="true" playsinline="true" class="video-item"></video> -->
+        <video-player class="swiper-player" ref="videoPlayer" :options="playerOptions" :playsinline="true" @play="onPlayerPlay($event)" @pause="onPlayerPause($event)" @ended="onPlayerEnded($event)" @loadeddata="onPlayerLoadeddata($event)" @waiting="onPlayerWaiting($event)" @playing="onPlayerPlaying($event)" @timeupdate="onPlayerTimeupdate($event)" @canplay="onPlayerCanplay($event)" @canplaythrough="onPlayerCanplaythrough($event)" @ready="playerReadied" @statechanged="playerStateChanged($event)">
+        </video-player>
+      </template>
+      <img alt="" class="swiper-image" :style="{heigth:height+'px'}" :src="item.imgUrl" v-else />
+    </van-swipe-item>
+    <template slot="indicator">
+      <div class="indicator-item row row-center">
+        <div class="indicator-progress row row-center" v-show="info.length&&!info[0]['videoUrl']">
+          <span> {{index+1}}/{{info.length}}</span>
         </div>
       </div>
-    </swiper-slide>
-    <!-- Optional controls -->
-    <div class="swiper-pagination" slot="pagination"></div>
-  </swiper>
+    </template>
+  </van-swipe>
 </template>
-
 <script>
+import Vue from "vue";
+import { GetUserInfo } from "@/api/login";
+import { Swipe, SwipeItem } from "vant";
+import VideoPlayer from "vue-video-player";
+import "vue-video-player/src/custom-theme.css";
+import "video.js/dist/video-js.css";
+import enableInlineVideo from "iphone-inline-video";
+import { isIosApp } from "@/plugin/Vincent/functions/ua";
+Vue.use(VideoPlayer);
+
 export default {
-  name: "carrousel",
+  name: "productSwiper",
   props: {
     info: {
       type: Array,
       default: () => {
-        [];
+        return [];
       }
     },
-    parent: {
-      type: String,
-      default: ""
+    height: {
+      type: [Number, String],
+      default: 750
     }
   },
-
   data() {
     return {
-      swiperOption: {
-        autoplay: true, //可选选项，自动滑动
-        // loop : true,
-        // autoplayDisableOnInteraction: false,
-        // some swiper options/callbacks
-        // 所有的参数同 swiper 官方 api 参数
-        pagination: {
-          el: ".swiper-pagination",
-          type: "fraction"
-        },
-        init: false
-      },
-      swiperSlides: [
-        {
-          imgUrl:
-            "http://img.gaindewo.com/220x220_5f83f6e9-8622-4ff7-ab21-760750e0e524.png",
-          targetUrl: "https://www.baidu.com"
-        },
-        {
-          imgUrl:
-            "http://img.gaindewo.com/220x220_41dd1ffb-f0f6-405a-bf8c-f81f582f5153.jpg",
-          targetUrl: "https://www.baidu.com"
-        }
-      ]
+      index: 0,
+      show: false,
+      autoplay: 3000,
+      playerOptions: {
+        height: "360",
+        autoplay: false,
+        muted: true,
+        language: "en",
+        preload: "auto",
+        // fullscreen: { options: { navigationUI: "hide" } },
+        sources: [
+          {
+            type: "video/mp4",
+            // mp4
+            src: ""
+            // webmhttp://video.gaindewo.com/sv/2417fc69-16f124185d6/2417fc69-16f124185d6.mp4
+            // src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
+          }
+        ],
+        notSupportedMessage: "此视频暂无法播放，请稍后再试",
+        poster: ""
+        // controlBar: {http://img.gaindewo.com/924463ea-8349-4033-92b8-3785a6e6e51f.png
+        //   timeDivider: true, //当前时间和持续时间的分隔符
+        //   durationDisplay: true, //显示持续时间
+        //   remainingTimeDisplay: true, //是否显示剩余时间功能
+        //   fullscreenToggle: true //全屏按钮
+        // }
+      }
     };
   },
+  computed: {
+    player() {
+      return this.$refs.videoPlayer.player;
+    },
 
+    opt() {
+      console.log(this.info);
+      return {};
+    }
+  },
+  mounted() {},
+  components: {
+    "van-swipe": Swipe,
+    "van-swipe-item": SwipeItem
+  },
   methods: {
-    jump(url) {
-      if (url) {
-        window.location.href = url;
+    init() {
+      console.log("初始化");
+    },
+    changeSwiper(index) {
+      this.index = index;
+      const video = document.querySelector("#swiperVideo");
+      if (video && !video.paused) {
+        video.pause();
       }
     },
-    tap() {
-      var tapTarget = event.target;
-      console.log(swiperTest.activeIndex);
-      //   if (swiperTest.activeIndex == 0 && tapTarget.tagName == "IMG") {
-      //     swiperTest.autoplay.stop();
-      //     $(".swiper-test")
-      //       .find(".video-item")
-      //       .toggle();
-      //     $(".swiper-test")
-      //       .find(".video-item")
-      //       .parent()
-      //       .find(".img-responsive")
-      //       .toggle();
-      //     var video = document.getElementById(".swiper-wrapper video");
-      //     // video.play(); //播放控制
-      //   } else if (swiperTest.activeIndex == 0 && tapTarget.tagName == "VIDEO") {
-      //     // $('.swiper-test').find('.video-item').toggle();
-      //     // $('.swiper-test').find('.video-item').parent().find('.img-responsive').toggle()
-      //   } else {
-      //     if (swiperTest.autoplay.running) {
-      //       swiperTest.autoplay.stop();
-      //     } else {
-      //       swiperTest.autoplay.start();
-      //     }
-      //   }
+    handleClick(e) {
+      let { index } = this;
+      if (index == 0) {
+        this.show = true;
+      }
     },
-    initSwiper() {
-      this.$nextTick(async () => {
-        await this.swiper.init(); // 现在才初始化
-        await this.swiper.slideTo(0);
-      });
+    onPlayerPlay(player) {
+      console.log("player play!", player);
+      const playerVideo = document.querySelector(
+        ".video-player.swiper-player video"
+      );
+      // if (playerVideo && playerVideo.paused) {
+      //   playerVideo.pause();
+      // }
+      // try {
+      //   playerVideo.play();
+      // } catch (e) {}
+    },
+    onPlayerPause(player) {
+      console.log("player pause!", player);
+    },
+    onPlayerEnded(player) {
+      // console.log('player ended!', player)
+    },
+    onPlayerLoadeddata(player) {
+      // console.log('player Loadeddata!', player)
+    },
+    playerReadied(player) {
+      console.log("视频准备就绪");
+      const playerVideo = document.querySelector(
+        ".video-player.swiper-player video"
+      );
+      const playerBtn = document.querySelector(
+        ".video-player.swiper-player .video-js .vjs-control-bar button>.vjs-icon-placeholder"
+      );
+
+      playerBtn.className = "vjs-icon-placeholder needsclick";
+      if (isIosApp) {
+        enableInlineVideo(playerVideo);
+      }
+      // playerVideo && playerVideo.removeAttribute("x5-video-player-type");
+      playerVideo && playerVideo.setAttribute("x-webkit-airplay", "allow");
+      playerVideo &&
+        playerVideo.setAttribute("x5-video-player-fullscreen", true);
+    },
+    onPlayerLoadeddata(player) {
+      // console.log('player Loadeddata!', player)
+    },
+    onPlayerWaiting(player) {
+      // console.log('player Waiting!', player)
+    },
+    onPlayerPlaying(player) {
+      // console.log('player Playing!', player)
+    },
+    onPlayerTimeupdate(player) {
+      // console.log('player Timeupdate!', player.currentTime())
+    },
+    onPlayerCanplay(player) {
+      // console.log('player Canplay!', player)
+    },
+    onPlayerCanplaythrough(player) {
+      // console.log('player Canplaythrough!', player)
+    },
+    // or listen state event
+    playerStateChanged(playerCurrentState) {
+      // console.log('player current update state', playerCurrentState)
+    },
+    handleVideo(e) {}
+  },
+  watch: {
+    $route: {
+      handler: "init",
+      immediate: true
+    },
+    info: {
+      handler: function(list) {
+        console.log(list);
+        if (list.length && list[0].videoUrl) {
+          this.playerOptions.poster = this.info[0].imgUrl;
+          this.playerOptions.sources[0].src = this.info[0].videoUrl;
+        }
+      },
+      immediate: true
     }
   },
-  computed: {
-    swiper() {
-      return this.$refs.mySwiper.swiper;
-    }
-  },
-  mounted() {
-    // current swiper instance
-    // 然后你就可以使用当前上下文内的swiper对象去做你想做的事了
-    this.initSwiper();
+  created() {
+    // console.log(this.info);
+    // if (this.info[0].videoUrl) {
+    //   this.playerOptions.poster = this.info[0].imgUrl;
+    // }
   }
 };
 </script>
-<style scoped>
-.swiper-box {
-  /* margin-top: 0.44rem; */
-  position: relative;
-  height: 2rem;
+<style lang="less" scoped>
+.van-swipe /deep/ .van-swipe__track {
+}
+.swiper-item {
+  box-sizing: border-box;
+  background-color: #fff;
 }
 
-.home_height {
-  height: 2rem;
-}
-.integral_height {
-  height: 1.2rem;
-}
-.carousel_img-box {
-  width: 100%;
-  overflow: hidden;
-}
-.carousel_img {
+.swiper-image {
   display: block;
-  /* height: 2rem; */
+  box-sizing: border-box;
+  width: 750px;
+  height: 750px;
+  object-fit: contain;
+  font-size: 0;
+}
+.indicator-item {
+  position: absolute;
+  bottom: 20px;
+  text-align: center;
+  left: 0;
+  right: 0;
+}
+.indicator-progress {
+  width: 120px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  font-size: 30px;
+  color: #fff;
+}
+#swiperVideo {
+  width: 750px;
+  height: 662px;
+  margin-top: 88px;
+  background-color: #000;
+  object-fit: contain;
+  // display: none;
+  // z-index: 101;
+}
+.swiper-player {
+  width: 750px;
+  height: 662px;
+  margin-top: 88px;
+}
+.swiper-player /deep/ .vjs_video_3-dimensions {
+  width: 750px;
+  height: 662px;
+}
+.swiper-player /deep/ .video-js {
   width: 100%;
+  height: 100%;
 }
-.carousel_point-container {
+.swiper-player /deep/ .video-js .vjs-tech {
+  position: initial;
+  width: 750px;
+  height: 662px;
 }
-.swiper-pagination.swiper-pagination-fraction {
-  font-size: 24px;
+.swiper-player /deep/ .video-js .vjs-control {
+  font-size: 22px;
 }
-</style>
-<style lang='less'>
-.carousel_point {
-  width: 0.05rem;
-  height: 0.05rem;
-  background-color: #f8fafb;
-  border-radius: 100%;
-  margin: 0 0.04rem;
+.swiper-player /deep/ .vjs-control-bar {
+  height: 60px;
 }
-.carousel_point-active {
-  //   background-color: @themeColor;
+.swiper-player /deep/ .video-js .vjs-big-play-button {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%);
+}
+.swiper-player /deep/ .video-js .vjs-control-bar {
+  transition: none;
+  opacity: 1;
+  display: flex;
+}
+.swiper-player /deep/ .vjs-has-started .vjs-control-bar {
+  transition: none;
+  opacity: 1;
+}
+.swiper-player /deep/ .video-js .vjs-control-bar .vjs-volume-panel {
+  display: none;
+}
+.swiper-player /deep/ .video-js .vjs-big-play-button {
+  height: 3em;
+  line-height: 3em;
+  border-radius: 50%;
+}
+.swiper-player /deep/ .video-js .vjs-big-play-button > span::before {
+  font-size: 2.6em;
 }
 </style>

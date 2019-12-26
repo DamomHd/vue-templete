@@ -3,17 +3,18 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-10-29 14:03:34
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-26 17:39:49
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-25 21:09:26
  * @description: 
  */
 import header from "./header.vue";
-import packageItem from "./Package.vue";
-import evaluate from "@/components/product/CommentList.vue";
-import ttz from "./Ttz.vue";
-import cardDialog from "./Card.vue";
-import ttzArgeement from "./TtzArgeement.vue";
+// import packageItem from "./Package.vue";
+// import evaluate from "@/components/product/CommentList.vue";
+// import ttz from "./Ttz.vue";
+// import cardDialog from "./Card.vue";
+// import ttzArgeement from "./TtzArgeement.vue";
 import util from '@/plugin/Vincent/functions/index'
+import { isAndroid } from '@/plugin/Vincent/functions/ua'
 import { mapMutations, mapState } from "vuex";
 import {
     getProduct,
@@ -27,22 +28,40 @@ import {
     createVipUser,
     querySalesAgreement,
     agreeSalesAgreement,
-    getBarainShareUrl
+    getBarainShareUrl,
+    getCardProductUrl
 } from '@/api/product'
 import { GetUserInfo } from '@/api/login'
 import {
     GoodsAction,
     GoodsActionIcon,
-    GoodsActionButton
+    GoodsActionButton,
+    Stepper
 } from 'vant';
 import inputNumber from "@/components/common/InputNumber.vue";
 export default {
     name: 'productDetail',
     data() {
         return {
+            isAndroid: isAndroid,
             isIniting: true, //是否初始化加载中 控制骨架屏
             isLoading: false, //是否在下拉刷新
-
+            headerInfo: [
+                {
+                    value: 'PRODUCT',
+                    name: '商品'
+                },
+                {
+                    value: 'EVALUATE',
+                    name: '评价'
+                },
+                {
+                    value: 'DETAIL',
+                    name: '详情'
+                }
+            ],
+            headerActive: true,
+            headerTabVal: 'PRODUCT',//头部商品PRODUCT 评价EVALUATE 详情DETAIL切换
             isHandleSkuFromItem: false,//是否从标题下规格栏选择
             count: 0,
             showDrawer: false,
@@ -83,6 +102,12 @@ export default {
             isSellOut: false,//商品是否 售罄
             shareUrl: '',//分享链接
             activityGrouponId: '',//是否参与他人拼团
+            cardStatus: '',//当前用户的储值卡状态
+            cardProductUrl: '',//储值卡商品的链接
+            fullReduces: null,//满减满件信息 
+            cartCount: 0,//购物车商品数量
+            isCartCountChange: false,//购物车数量是否变化
+            isAddLoading: false,//加入购物车或直接购买loading
             shareGuideImg: {
                 normal: require('../../assets/images/product/share_guide.png'),
                 bargain: require('../../assets/images/product/share_bargain.png'),
@@ -93,21 +118,24 @@ export default {
             elTop: 0,
             showImagePreview: false,
             imagePreviewList: [],
-            imagePreviewIndex: 0
+            imagePreviewIndex: 0,
+
         }
     },
     components: {
-        "v-evaluate": evaluate,
+        "v-evaluate": () => import("@/components/product/CommentList.vue"),
         inputNumber,
         // "v-drawer": drawer,
         "v-head": header,
-        "v-package": packageItem,
+        "v-package": () => import("./Package.vue"),
         "van-goods-action": GoodsAction,
         "van-goods-action-icon": GoodsActionIcon,
         "van-goods-action-button": GoodsActionButton,
-        "v-ttz": ttz,
-        "v-ttzArgeement": ttzArgeement,
-        "v-cardDialog": cardDialog
+        "van-stepper": Stepper,
+        "v-ttz": () => import("./Ttz.vue"),
+        "v-ttzArgeement": () => import("./TtzArgeement.vue"),
+        "v-cardDialog": () => import("./Card.vue"),
+        "vc-swiper": () => import("@/components/common/swiper.vue")
     },
     watch: {
         //监听路由变化
@@ -115,45 +143,16 @@ export default {
             handler: "pageInit", //监听触发的方法
             immediate: true
         },
-        selectSkuIndex: function (nVal) {
-            let { skusList, product } = this;
-            let sku = skusList[nVal];
-            //设置当前sku的限购信息
-            var countBuy = sku.countBuy || 0;
-            var limitAmount = sku.limitAmount || 0;
-            var pro_countBuy = product.countBuy;
-            var pro_limitAmount = product.limitBuy;
-            var limitNumber = 0;
-            var canBuy = 0;
-            //如果有设置商品的限购 需要对应的展示限购参数
-            if (pro_limitAmount && pro_limitAmount != '0') {
-                //设置了单sku限购数量限制
-                if (limitAmount && limitAmount != 0) {
-                    if (limitAmount > pro_limitAmount) {
-                        limitNumber = pro_limitAmount
-                    }
-                    else {
-                        limitNumber = limitAmount;
-                    }
-                    canBuy = limitAmount - countBuy
-                }
-                //仅设置了商品限购数
-                else {
-                    limitNumber = pro_limitAmount;
-                    canBuy = pro_limitAmount - pro_countBuy;
-                }
-            }
-            //无做任何限购处理
-            else if (limitAmount && limitAmount != 0) {
-                limitNumber = limitAmount;
-                canBuy = limitAmount - countBuy;
-            }
-            this.countBuy = limitNumber - canBuy;
-            this.limitAmount = limitNumber
-        }
+        selectSkuIndex: {
+            handler: 'changeSelectSku'
+            // immediate: true
+        },
     },
     mounted() {
-        console.log('加载完成')
+        document.addEventListener('scroll', this.throttle(this.handlerScroll, 3000, 0), true)
+    },
+    destroy() {
+        document.removeEventListener('scroll', this.handlerScroll, true)
     },
     computed: {
         ...mapState('Vincent', {
@@ -172,10 +171,19 @@ export default {
                 /https:\/\/video.gaindewo.com(([\s\S])*?).mp4/g
             );
         },
+        /**
+         * @description: 获取当前是否是多规格设置了限购数量或者已购数量已经超出了
+         * @return {Boolean}
+         * @Date: 2019-12-11 17:15:14
+         */
         isLimitFull() {
-            //获取当前是否是多规格设置了限购数量或者已购数量已经超出了
-            let { countBuy, limitAmount, buyNumber } = this;
+            let { countBuy, limitAmount, buyNumber, promotion } = this;
             var amount = buyNumber;
+            //判断限购活动商品是否已超出限购数量
+            if (promotion && promotion.type == "LIMITBUY" && amount + countBuy > promotion.limitBuyAmount) {
+                this.$toast('您所选规格数量已超出限购数量，不可购买！')
+                return false;
+            }
             if (typeof countBuy !== 'undefined' && typeof limitAmount !== 'undefined' && limitAmount !== 0) {
                 if (parseInt(amount) + parseInt(countBuy) > Number(limitAmount)) {
                     this.$toast('您所选规格数量已超出限购数量，不可购买！')
@@ -184,7 +192,11 @@ export default {
             }
             return true;
         },
-        //团团赚包裹补贴 分享弹窗展示对应等级的包裹补贴信息
+        /**
+         * @description: 团团赚包裹补贴 分享弹窗展示对应等级的包裹补贴信息 
+         * @return {Array}
+         * @Date: 2019-12-11 17:07:20
+         */
         productPackageRebates() {
             let { isAnyTtzVip, ttzVipLevel, product } = this;
             let { productPackageRebates } = product;
@@ -192,6 +204,13 @@ export default {
                 return productPackageRebates.filter(item => item.vipType == ttzVipLevel);
             return [];
         },
+        /**
+         * @description: 
+         * @LastEditTime: 
+         * @return {Object,null}
+         * @LastEditors: vincent_Huanghd@126.com
+         * @Date: 2019-12-11 17:07:56
+         */
         promotionVo() {
             let { promotion, product } = this;
             if (promotion) {
@@ -206,7 +225,13 @@ export default {
             }
             return null
         },
-        //活动商品标识
+        /**
+         * @description: 活动商品标识
+         * @LastEditTime: Do not Edit
+         * @return {String}
+         * @LastEditors: vincent_Huanghd@126.com
+         * @Date: 2019-12-11 17:12:57
+         */
         promotionTitle() {
             let { promotion } = this
             let type = promotion && promotion.type || ''
@@ -219,7 +244,12 @@ export default {
             };
             return map[type] || "";
         },
-        //活动商品描述  团团赚分享赚取补贴
+        /**
+         * @description: 活动商品描述  团团赚分享赚取补贴
+         * @return {String}
+         * @LastEditors: vincent_Huanghd@126.com
+         * @Date: 2019-12-11 17:14:15
+         */
         promotionDes() {
             let { promotion, product } = this
             let type = promotion && promotion.type || ''
@@ -234,7 +264,6 @@ export default {
         }
 
     },
-
     methods: {
         ...mapMutations("Vincent/wxShare", ["resetShareInfo"]),
         async login() {
@@ -243,6 +272,37 @@ export default {
                 this.hasLogin = 1
             }
             this.fresh()
+        },
+        //执行函数 等待时间 
+        throttle(func, wait, mustRun) {
+            var timeout,
+                startTime = new Date();
+
+            return function () {
+                var context = this,
+                    args = arguments,
+                    curTime = new Date();
+
+                clearTimeout(timeout);
+                // 如果达到了规定的触发时间间隔，触发 handler
+                if (curTime - startTime >= mustRun) {
+                    func.apply(context, args);
+                    startTime = curTime;
+                    // 没达到触发间隔，重新设定定时器
+                } else {
+                    timeout = setTimeout(func, wait);
+                }
+            };
+        },
+        //监听滚动
+        handlerScroll(e) {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > 100) {
+                this.headerActive = false
+            }
+            else {
+                this.headerActive = true
+            }
         },
         //获取砍价邀请好友链接
         async inviteBargainShareUrl() {
@@ -261,7 +321,20 @@ export default {
                 this.resetShareInfo({ link: shareUrl });
 
                 //邀请好友 
-                this.showGuideShare = true;
+                if (this.$isFromApp) {
+                    let { shareInfo } = this
+                    try {
+                        shareWechat(shareInfo.title, shareUrl, shareInfo.imgUrl);
+                    } catch (e) {
+                    }
+                    try {
+                        window.purchase.shareWechat(shareInfo.title, shareUrl, shareInfo.imgUrl)
+                    } catch (e) {
+                    }
+                }
+                else {
+                    this.showShare = true;
+                }
             }
         },
         //刷新
@@ -277,6 +350,7 @@ export default {
         closeDrawer() {
             this.showDrawer = !this.showDrawer;
         },
+        //展示评论
         showAllEvaluate() {
             var productId = this.product.id
             if (!this.hasLogin) {
@@ -314,35 +388,97 @@ export default {
                 min = skusList[selectSkuIndex]['ordinaryMinBuyLimit']
             }
             if (max && max != 0 && buyNumber > max) {
-                this.$toast('您所选规格数量已超出最高起订量')
+                this.$toast('您所选规格数量已超出最高起订量' + max + '件')
                 return false;
             }
             else if (min && min != 0 && buyNumber < min) {
-                this.$toast('您所选规格数量少于最低起订量')
+                this.$toast('您所选规格数量少于最低起订量' + min + '件')
                 return false;
             }
             return true;
         },
         //跳转购物车
         jumpCart() {
-            this.$toast(String(this.$isFromApp))
-            if (this.$isFromApp) {
-                try { window.goCart(); } catch (e) { }
-                try { window.purchase.goCart() } catch (e) { }
-            } else {
-                window.location.href = "/shop#/car";
+            let { hasLogin } = this;
+            if (hasLogin) {
+                if (this.$isFromApp) {
+                    try { window.goCart(); } catch (e) { }
+                    try { window.purchase.goCart() } catch (e) { }
+                } else {
+                    window.location.href = "/shop#/car";
+                }
             }
+            else {
+                //未登录提示
+                this.$goLogin()
+            }
+        },
+        //监听选中sku变化
+        changeSelectSku(nVal = 0) {
+            let { skusList, product } = this;
+            let sku = skusList[nVal];
+            //设置当前sku的限购信息
+            var countBuy = sku.countBuy || 0;
+            var limitAmount = sku.limitAmount || 0;
+            var pro_countBuy = product.countBuy;
+            var pro_limitAmount = product.limitAmount;
+            var limitNumber = 0;
+            var canBuy = 0;
+            //如果有设置商品的限购 需要对应的展示限购参数
+            if (pro_limitAmount && pro_limitAmount != '0') {
+                //设置了单sku限购数量限制
+                if (limitAmount && limitAmount != 0) {
+                    if (limitAmount > pro_limitAmount) {
+                        limitNumber = pro_limitAmount
+                    }
+                    else {
+                        limitNumber = limitAmount;
+                    }
+                    canBuy = limitAmount - countBuy
+                }
+                //仅设置了商品限购数
+                else {
+                    limitNumber = pro_limitAmount;
+                    canBuy = pro_limitAmount - pro_countBuy;
+                }
+            }
+            //无做任何限购处理
+            else if (limitAmount && limitAmount != 0) {
+                limitNumber = limitAmount;
+                canBuy = limitAmount - countBuy;
+            }
+            this.countBuy = limitNumber - canBuy;
+            this.limitAmount = limitNumber;
+        },
+        //显示提示用户无法继续购买储值卡提醒
+        showCardConfirm() {
+            let { cardStatus } = this;
+            let txt = cardStatus == 'REFUNDING' ? '抱歉，由于您当前的储值卡正在退卡中，暂时不能购买储值卡哦！如有需求可去我的储值卡-退卡功能内取消退卡。' : '抱歉，您当前的卡正常使用中，暂不可购买，如有需求可去我的储值卡内充值或升级您的储值卡。'
+            this.$dialog.confirm({
+                message: txt,
+                width: '270px',
+                messageAlign: 'left',
+                className: 'vc-vant-confirm-modal',
+                confirmButtonText: cardStatus == 'NORMAL' ? '升级或充值' : '知道了',
+                showCancelButton: cardStatus == 'NORMAL',
+            }).then(() => {
+                //正常状态跳转到储值卡首页
+                if (cardStatus == 'NORMAL') {
+                    window.location.href = '/card/index'
+                }
+                // on confirm
+            }).catch(() => {
+                // on cancel
+            });
         },
         //加入购物车
         addCart() {
-            //判断是否需要展示销售协议
-            if (this.showSalesSwitch) {
-                this.showSales = true;
-                return;
-            }
-            if (!this.isAnyTtzVip && this.product.ttzFlag) {
-                this.showTtzAgreement = true;
-                return;
+            let { promotion } = this;
+            if (!this.beforeChooseSku()) return;
+            //判断当前商品是否是砍价/团购  不可加入购物车
+            if (promotion && (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN')) {
+                this.$toast('该活动商品暂不支持加入购物车!')
+                return false;
             }
             this.orderType = 1;
             this.showDrawer = true;
@@ -350,15 +486,7 @@ export default {
         //想买  isBuyForMarketPrice 是否原价购买 默认false
         wantBuy({ isBuyForMarketPrice = false } = {}) {
             let { promotion } = this;
-            //判断是否需要展示销售协议
-            if (this.showSalesSwitch) {
-                this.showSales = true;
-                return;
-            }
-            if (!this.isAnyTtzVip && this.product.ttzFlag) {
-                this.showTtzAgreement = true;
-                return;
-            }
+            if (!this.beforeChooseSku()) return;
             this.orderType = 0;
             //如果是拼团或者砍价 只能是单规格且数量不可改动 直接下单
             if (promotion && (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN')) {
@@ -387,8 +515,45 @@ export default {
             //如果是拼团  砍价  只能是单规格不能选择规格 数量
             let { promotion } = this;
             if (promotion && (promotion.type == 'GROUPON' || promotion.type == 'BARGAIN')) return;
+            if (!this.beforeChooseSku()) return;
             this.isHandleSkuFromItem = true;
             this.showDrawer = true;
+        },
+        //弹窗sku选择之前前置判断
+        beforeChooseSku() {
+            //当前商品是储值卡商品 并且卡状态为退卡中或者正常
+            if (this.cardStatus == 'REFUNDING' || this.cardStatus == 'NORMAL') {
+                this.showCardConfirm()
+                return false;
+            }
+            //判断是否需要展示销售协议
+            if (this.showSalesSwitch) {
+                this.showSales = true;
+                return false;
+            }
+            if (!this.isAnyTtzVip && this.product.ttzFlag) {
+                this.showTtzAgreement = true;
+                return false;
+            }
+
+            return true;
+        },
+        /**
+         * @description: 展示储值卡对应的sku优惠明明细
+         * @param {type} 
+         * @return: 
+         * @Date: 2019-12-11 18:22:15
+         */
+        async showSkuDeposit() {
+            let { cardProductUrl } = this;
+            if (!cardProductUrl) {
+                let res = await getCardProductUrl();
+                if (res.errorCode == 200) {
+                    this.cardProductUrl = res.data;
+                }
+            }
+            this.showCardDialog = true;
+
         },
         //预览sku图片
         previewImage() {
@@ -405,16 +570,18 @@ export default {
             this.imagePreviewIndex = index;
         },
         //改变购买数量
-        setNumber(option) {
-            console.log(option)
-            let val = option.value;
-            this.buyNumber = val;
+        setNumber(val) {
+            let { skusList, selectSkuIndex } = this;
+            if (val >= skusList[selectSkuIndex]['amount']) {
+                this.buyNumber = skusList[selectSkuIndex]['amount'];
+            }
         },
-        //选择规则 切换变化
-        selectSku(skuIndex) {
-            this.selectSkuIndex = skuIndex;
-            this.buyNumber = 1;
-            console.log(this.skusList[skuIndex])
+        //选择规则 切换变化  库存不能为0
+        selectSku(skuIndex, amount) {
+            if (amount) {
+                this.selectSkuIndex = skuIndex;
+                this.buyNumber = 1;
+            }
         },
         //查询销售协议
         async querySalesAgreement() {
@@ -443,8 +610,8 @@ export default {
         //加入购物车 1||购买 0   
         //isBuyForMarketPrice  是否原价购买 true为原价购买
         async addProduct({ isBuyForMarketPrice = false } = {}) {
+
             //判断当前商品是否超出限购
-            console.log(111)
             if (!this.isLimitFull) return;
             //判断团团赚是否不符合最大 最小起订量
             if (!this.isLimitFullForTtz()) return;
@@ -455,7 +622,7 @@ export default {
             let qty = this.buyNumber;
             //是否为复合商品，如果是跳转选择套餐
             let isBasicPro = this.product.combination;
-            let { shopId, activityGrouponId } = this;
+            let { shopId, activityGrouponId, promotion, promotionVo } = this;
             //加入购物车
             if (this.orderType) {
                 let data = {
@@ -465,14 +632,9 @@ export default {
                     shopOwnerId: shopId,
                     type: "addCart"
                 };
-
-                // 如果时限购 加上活动id
-                if (this.promotion && !isBuyForMarketPrice) {
-                    data["promotionId"] = this.promotion.id;
-                }
-                //路由携带该参数则为参加拼团活动
-                if (activityGrouponId) {
-                    data['activityGrouponId'] = activityGrouponId
+                // 如果是限购 加上活动id
+                if (promotion && promotion.type != 'FLASHSALE' && promotion.hasOwnProperty('id') && !isBuyForMarketPrice) {
+                    data["promotionId"] = promotion.id;
                 }
                 //该商品为复合商品规格，需要选择对应sku
                 if (isBasicPro == 1) {
@@ -484,15 +646,20 @@ export default {
                         window.location.href = "/shop?route=productPackage&params=" + JSON.stringify(data);
                     }
                 } else {
+                    this.isAddLoading = true;
                     let response = await addCart(data);
-                    if (response.errorCode == 200 && response.data) {
+                    if (response.errorCode == 200) {
                         this.showDrawer = false;
                         //加入购物车动画
                         this.showMoveDot = [...this.showMoveDot, true];
+                        if (this.cartCount < response.data) {
+                            this.isCartCountChange = true;
+                        }
                         this.$toast("加入购物车成功！");
                     } else {
                         this.$toast(response.moreInfo);
                     }
+                    this.isAddLoading = false;
                 }
                 //直接下单
             } else {
@@ -506,12 +673,16 @@ export default {
                         qty: qty
                     };
                     // 如果时限购 加上活动id
-                    if (this.promotion && !isBuyForMarketPrice) {
-                        data["promotionId"] = this.promotion.id;
+                    if (promotion && promotion.type != 'FLASHSALE' && promotion.hasOwnProperty('id') && !isBuyForMarketPrice) {
+                        data["promotionId"] = promotion.id;
                     }
                     //路由携带该参数则为参加拼团活动
                     if (activityGrouponId) {
                         data['activityGrouponId'] = activityGrouponId
+                    }
+                    //如果当前是砍价商品 携带当前砍价detailId 获取最优惠价格
+                    if (promotion && promotion.type == "BARGAIN") {
+                        data['activityGrouponId'] = promotionVo.detailId
                     }
                     //混批
                     if (mixBatch == 1) {
@@ -524,12 +695,16 @@ export default {
                 } else {
                     let params = `skuId=${skuId}&shopId=${shopId}&qty=${qty}&productId=${productId}`;
                     // 如果时限购 加上活动id
-                    if (this.promotion && !isBuyForMarketPrice) {
-                        params += `&promotionId=${this.promotion.id}`;
+                    if (promotion && promotion.type != 'FLASHSALE' && promotion.hasOwnProperty('id') && !isBuyForMarketPrice) {
+                        params += `&promotionId=${promotion.id}`;
                     }
                     //路由携带该参数则为参加拼团活动
                     if (activityGrouponId) {
                         params += `&activityGrouponId=${activityGrouponId}`;
+                    }
+                    //如果当前是砍价商品 携带当前砍价detailId 获取最优惠价格
+                    if (promotion && promotion.type == "BARGAIN") {
+                        params += `&activityGrouponId=${promotionVo.detailId}`;
                     }
                     window.location.href = '/cart/next?' + params
                 }
@@ -542,9 +717,6 @@ export default {
             let { id } = this.product;
             let res = await updateCollectProduct(type, { productId: id });
             if (res.errorCode == 200 && res.data) {
-                this.$toast({
-                    message: isCollection ? "取消收藏成功！" : "收藏成功！"
-                });
                 this.isCollection = !isCollection;
             }
         },
@@ -566,23 +738,34 @@ export default {
             this.isIniting = false;
             this.commentsRecords = [];
             let _this = this;
-            this.swiperList = response.data.imgsList.map(item => {
+            this.product = { ...response.data.product };
+            this.swiperList = this.product.imgs.map(item => {
                 return {
-                    imgUrl: item,
-                    targetUrl: ''
+                    imgUrl: item.imgUrl,
+                    targetUrl: '',
+                    videoUrl: item.videoUrl
                 }
             })
-            this.product = { ...response.data.product };
+            console.log(sessionStorage.getItem('cartCount'), 'cartCount')
+            if (sessionStorage.getItem('cartCount')) {
+                this.cartCount = sessionStorage.getItem('cartCount');
+                sessionStorage.removeItem('cartCount')
+            }
+            else {
+                this.cartCount = response.data.cartCount;
+            }
             this.isCollection = response.data.isCollection;
             this.ttzPromotion = response.data.ttzPromotion || null;
             this.article = this.product.fullText;
             this.isTwitter = response.data.isTwitter; //是否代理
             this.hasLogin = response.data.login || 0;//是否登录
+            this.cardStatus = response.data.cardStatus;//当前用户储值卡状态
             this["shopId"] = response.data.shop.ownerId;
             this.skusList = this.product.skus.map(item => {
                 item["spec"] = item["spec"].split(",").join("+");
                 return item;
             });
+            this.changeSelectSku();
             this.shareUrl = response.data.shareUrl;
             //重置分享信息
             this.resetShareInfo({ title: this.product.name, imgUrl: this.product.imgUrl, link: response.data.shareUrl })
@@ -595,7 +778,7 @@ export default {
                 this.querySalesAgreement();
             }
             //团团转商品判断
-            if (response.data.product.ttzFlag) {
+            if (response.data.product.ttzFlag && response.data.login == 1) {
                 this.queryIsAnyTtzVip()
             }
             else {
@@ -614,7 +797,13 @@ export default {
                 this.promotion["resetStart"] = this.product.presellVO.restStartAt;
                 this.promotion["resetEnd"] = this.product.presellVO.restEndAt;
             } else {
+                //限购活动 追加限购数量
+                if (response.data.promotion.type == 'LIMITBUY') {
+                    response.data.promotion.limitBuyAmount = response.data.limitBuyAmount;
+                }
+
                 this.promotion = response.data.promotion;
+
             }
             //评论
             let commentsRecords = [...response.data.commentsRecords];
@@ -624,6 +813,10 @@ export default {
                 item["star"] = Number(item["star"]);
                 _this.commentsRecords.push(item);
             });
+            //满减满件
+            if (response.data.hasOwnProperty("fullReduces")) {
+                this.fullReduces = response.data.fullReduces;
+            }
             if (response.data.hasOwnProperty("currentSellerShopId")) {
                 this.currentSellerShopId = response.data.currentSellerShopId;
             }
@@ -680,30 +873,52 @@ export default {
             if (res.errorCode == 200) {
                 this.init(res);
             }
+            else {
+            }
         },
         //初始化商品数据
-        async initProduct(params) {
+        initProduct(params) {
             this.isIniting = true;
-            const response = await getProduct(params.id, params);
-            if (response.errorCode == 200) {
-                this.init(response);
-            } else if (response.errorCode == 302) {
-                let url = response.moreInfo;
-                this.redirectInit(url);
-            }
+            // const response = await getProduct(params.id, params);
+            getProduct(params.id || '', params).then(response => {
+                if (response.errorCode == 200) {
+                    this.init(response);
+                } else if (response.errorCode == 302) {
+                    let url = response.moreInfo;
+                    this.redirectInit(url);
+                } else {
+                    let { path, query, name } = this.$route;
+                    let route = {
+                        path: path,
+                        query: query,
+                        name: name
+                    }
+                    this.$router.replace({
+                        path: '/error',
+                        query: {
+                            route: encodeURIComponent(JSON.stringify(route))
+                        }
+                    })
+                }
+            }).catch(err => {
+                console.log(err)
+            })
         },
         //获取推荐商品
-        async getRecommend(id) {
-            const response = await getRecommend({ productId: id });
-            if (response.errorCode == 200 && response.data.length) {
-                this.recommendList = [...response.data];
-            }
+        getRecommend(id) {
+            getRecommend({ productId: id }).then(response => {
+                if (response.errorCode == 200 && response.data.length) {
+                    this.recommendList = [...response.data];
+                }
+            })
         },
-        async getCollocation(id) {
-            const response = await getCollocation({ productId: id });
-            if (response.errorCode == 200 && response.data.length) {
-                this.collocationList = [...response.data];
-            }
+        //
+        getCollocation(id) {
+            getCollocation({ productId: id }).then(response => {
+                if (response.errorCode == 200 && response.data.length) {
+                    this.collocationList = [...response.data];
+                }
+            })
         },
         //跳转首页
         jumpHome() {
@@ -724,14 +939,11 @@ export default {
         },
         //分享按钮
         sharePd() {
-
             if (!this.$isFromApp) {
                 this.showShare = true;
             }
             else {
-
                 let { product, isAnyTtzVip, shareInfo, productPackageRebates } = this;
-
                 //团团赚商品
                 if (product.ttzFlag) {
                     //未加入团团赚会员  弹窗先同意一种会员
@@ -789,7 +1001,6 @@ export default {
         },
         //设置结束点
         afterEnter(el) {
-            console.log('之后')
             // 获取底部购物车徽标的位置
             const badgePosition = document
                 .getElementById("buycar")
@@ -816,6 +1027,11 @@ export default {
         },
         //监听动画结束
         listenInCart() {
+            let { isCartCountChange } = this;
+            if (isCartCountChange) {
+                this.cartCount = this.cartCount + 1;
+                this.isCartCountChange = false;
+            }
             // 拿到购物车的DOM添加class
             document.getElementById("buycar").classList.add('moveToCart');
             setTimeout(() => {
@@ -851,10 +1067,22 @@ export default {
             if ((!localParam) && (currentSellerShopId || currentSellerId)) {
                 localStorage.setItem('inviteParam', JSON.stringify({ currentSellerShopId: currentSellerShopId, currentSellerId: currentSellerId }))
             }
+        },
+        //el 标签  speed 滚动速率 此处是50px 值越大滚动的越快
+        goAssignBlock(headerTabVal, speed = 50) {
+            this.headerTabVal = headerTabVal;
+            this.$nextTick(() => {
+                let h = this.$refs[headerTabVal].offsetHeight; //模块内容高度
+                let t = this.$refs[headerTabVal].offsetTop; //模块相对于内容顶部的距离
+                function step() {
+                    window.scrollTo(0, t - 40);
+                    // requestId = window.requestAnimationFrame(step);
+                }
+                window.requestAnimationFrame(step);
+            })
         }
     },
     created() {
-
         this.setShareInfo()
     }
 }

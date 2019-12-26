@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-11-13 10:30:55
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-21 14:22:48
+ * @LastEditTime: 2019-12-17 15:47:08
  * @description: 
  */
 import { getJsapiSignature } from '@/api/login'
@@ -25,7 +25,7 @@ export const wechatAuth = async () => {
             timestamp: authRes.data.timestamp,
             nonceStr: authRes.data.nonceStr,
             signature: authRes.data.signature,
-            jsApiList: ["onMenuShareAppMessage", "onMenuShareTimeline"] //"updateAppMessageShareData", "updateTimelineShareData", 
+            jsApiList: ["onMenuShareAppMessage", "onMenuShareTimeline", "onMenuShareQQ", "onMenuShareQZone"] //"updateAppMessageShareData", "updateTimelineShareData", 
         });
 
         wx.ready(() => {
@@ -63,6 +63,33 @@ export const wechatAuth = async () => {
                 imgUrl: shareConfig.imgUrl,
                 success: function () {
                     shareSuccessCallback();
+                }
+            });
+            //分享到QQ
+            wx.onMenuShareQQ({
+                title: shareConfig.title,
+                desc: shareConfig.desc,
+                link: shareConfig.link,
+                imgUrl: shareConfig.imgUrl,
+                success: function (res) {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function (res) {
+                    // 用户取消分享后执行的回调函数
+                }
+            });
+
+            //分享到QQ空间
+            wx.onMenuShareQZone({
+                title: shareConfig.title,
+                desc: shareConfig.desc,
+                link: shareConfig.link,
+                imgUrl: shareConfig.imgUrl,
+                success: function (res) {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function (res) {
+                    // 用户取消分享后执行的回调函数
                 }
             });
         });

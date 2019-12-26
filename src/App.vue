@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-20 10:56:29
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-24 10:48:54
  * @description: 
  -->
 <template>
@@ -36,5 +36,8 @@ export default {
   text-align: center;
   color: #2c3e50;
   box-sizing: border-box;
+}
+img {
+  object-fit: contain;
 }
 </style>

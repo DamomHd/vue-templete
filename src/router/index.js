@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:26:18
- * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-13 18:14:09
+ * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditTime : 2019-12-20 11:04:10
  * @description: 
  */
 import Vue from 'vue'
@@ -16,7 +16,7 @@ Vue.use(VueRouter)
 import routes from './routes'
 const router = new VueRouter({
     mode: 'history',
-    base: '/pNew',
+    base: '/newShop',
     routes
 })
 
