@@ -3,7 +3,7 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
- * @LastEditors  : vincent_Huanghd@126.com
+ * @LastEditors: vincent_Huanghd@126.com
  * @LastEditTime : 2019-12-26 13:30:32
  * @description: 
  */
@@ -16,6 +16,7 @@ import 'reset-css';
 import 'font-awesome/css/font-awesome.min.css'
 //导入全局过滤器
 import filters from '@/plugin/Vincent/filter'
+import directive from '@/plugin/Huode/directive'
 //引入弹性布局
 import '@/assets/style/flex.css';
 import '@/assets/style/sprites.css';
@@ -49,6 +50,8 @@ export default {
         Object.keys(filters).forEach((key) => {
             Vue.filter(key, filters[key])
         })
+        //指令注册
+        Vue.use(directive)
         Vue.prototype.$toast = util.toast
         //未登录前的登录提醒
         Vue.prototype.$goLogin = util.loginConfirm;
