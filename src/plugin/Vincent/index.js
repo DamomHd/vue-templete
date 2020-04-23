@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:10:37
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-26 13:30:32
+ * @LastEditTime: 2020-04-23 16:30:31
  * @description: 
  */
 
@@ -16,7 +16,7 @@ import 'reset-css';
 import 'font-awesome/css/font-awesome.min.css'
 //导入全局过滤器
 import filters from '@/plugin/Vincent/filter'
-import directive from '@/plugin/Huode/directive'
+import directive from '@/plugin/Vincent/directive'
 //引入弹性布局
 import '@/assets/style/flex.css';
 import '@/assets/style/sprites.css';
@@ -31,7 +31,7 @@ import FastClick from 'fastclick'; // 引入插件
 FastClick.attach(document.body); // 使用 fastclick   需要禁用则添加class= 'needsclick'
 
 export default {
-    install(Vue) {
+    install (Vue) {
         // 设置为 false 以阻止 vue 在启动时生成生产提示
         // https://cn.vuejs.org/v2/api/#productionTip
         Vue.config.productionTip = false

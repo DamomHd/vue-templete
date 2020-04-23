@@ -3,8 +3,8 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 15:31:50
- * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-23 17:29:15
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2020-04-23 16:31:28
  * @description: 
  */
 
@@ -14,7 +14,7 @@ const _import = require('@/libs/util.import.' + process.env.NODE_ENV)
 const frame = [
     {
         path: '/',
-        redirect: '/product'
+        redirect: '/study'
     },
     {
         path: '/product',
@@ -39,7 +39,7 @@ const frame = [
     {
         path: '*',
         redirect: '/error'
-    }
+    },
     // {
     //     path: '/test',
     //     name: 'test',
@@ -49,15 +49,15 @@ const frame = [
     //     },
     //     component: _import('index/index.vue')
     // },
-    // {
-    //     path: '/study',
-    //     name: 'study',
-    //     meta: {
-    //         auth: true,
-    //         title: '组件传参学习'
-    //     },
-    //     component: _import('study/component-communication/index')
-    // }
+    {
+        path: '/study',
+        name: 'study',
+        meta: {
+            auth: true,
+            title: '组件传参学习'
+        },
+        component: _import('study/component-communication/index')
+    }
 ]
 export default [
     ...frame

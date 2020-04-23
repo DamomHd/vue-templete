@@ -3,13 +3,13 @@
  * @version: v1.0
  * @Author: hongda_huang
  * @Date: 2019-07-03 16:26:29
- * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-25 17:08:35
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2020-04-23 17:57:30
  * @description: 
  */
 import cookies from './util.cookies'
 import { Toast, Dialog } from 'vant';
-
+import { isIos } from '@/plugin/Vincent/functions/ua'
 import log from './util.log'
 const util = {
     log,
@@ -23,7 +23,27 @@ const util = {
 util.title = function (titleText) {
     // const processTitle = process.env.VUE_APP_TITLE || 'Vincent'
     // window.document.title = `${processTitle}${titleText ? ` | ${titleText}` : ''}`
-    window.document.title = titleText
+    //设置页面title  SPA设置无效问题
+    if (isIos) {
+        //利用iframe的onload事件刷新页面
+        setTimeout(() => {
+            window.document.title = titleText
+            var iframe = document.createElement('iframe');
+            iframe.style.visibility = 'hidden';
+            iframe.style.width = '1px';
+            iframe.style.height = '1px';
+            iframe.onload = function () {
+                setTimeout(function () {
+                    document.body.removeChild(iframe);
+                }, 0)
+            }
+            document.body.appendChild(iframe)
+        }, 0)
+    }
+    else {
+        window.document.title = titleText
+
+    }
 }
 
 util.toast = function (options) {
@@ -90,7 +110,7 @@ util.debounce = function (func, wait, options) {
 
     // ----------- 开闭定时器 -----------
     // 开启定时器
-    function startTimer(pendingFunc, wait) {
+    function startTimer (pendingFunc, wait) {
         // 没传 wait 时调用 window.requestAnimationFrame()
         if (useRAF) {
             // 若想在浏览器下次重绘之前继续更新下一帧动画
@@ -104,7 +124,7 @@ util.debounce = function (func, wait, options) {
 
     // 取消定时器
     // 取消定时器
-    function cancelTimer(id) {
+    function cancelTimer (id) {
         if (useRAF) {
             return root.cancelAnimationFrame(id)
         }
@@ -114,7 +134,7 @@ util.debounce = function (func, wait, options) {
 
     // 定时器回调函数，表示定时结束后的操作
     // 定时器回调函数，表示定时结束后的操作
-    function timerExpired() {
+    function timerExpired () {
         const time = Date.now()
         // 1、是否需要执行
         // 执行事件结束后的那次回调，否则重启定时器
@@ -128,7 +148,7 @@ util.debounce = function (func, wait, options) {
 
     // 计算仍需等待的时间
     // 计算仍需等待的时间
-    function remainingWait(time) {
+    function remainingWait (time) {
         // 当前时间距离上一次调用 debounce 的时间差
         const timeSinceLastCall = time - lastCallTime
         // 当前时间距离上一次执行 func 的时间差
@@ -148,7 +168,7 @@ util.debounce = function (func, wait, options) {
     // ----------- 执行传入函数 -----------
     // 执行连续事件刚开始的那次回调
     // 执行连续事件刚开始的那次回调
-    function leadingEdge(time) {
+    function leadingEdge (time) {
         // 1、设置上一次执行 func 的时间
         lastInvokeTime = time
         // 2、开启定时器，为了事件结束后的那次回调
@@ -161,7 +181,7 @@ util.debounce = function (func, wait, options) {
 
     // 执行连续事件结束后的那次回调
     // 执行连续事件结束后的那次回调
-    function trailingEdge(time) {
+    function trailingEdge (time) {
         // 清空定时器
         timerId = undefined
 
@@ -179,7 +199,7 @@ util.debounce = function (func, wait, options) {
 
     // 执行 func 函数
     // 执行 Func 函数
-    function invokeFunc(time) {
+    function invokeFunc (time) {
         // 获取上一次执行 debounced 的参数
         const args = lastArgs
         // 获取上一次的 this
@@ -195,7 +215,7 @@ util.debounce = function (func, wait, options) {
 
     // 判断此时是否应该执行 func 函数
     // 判断此时是否应该执行 func 函数
-    function shouldInvoke(time) {
+    function shouldInvoke (time) {
         // 当前时间距离上一次调用 debounce 的时间差
         const timeSinceLastCall = time - lastCallTime
         // 当前时间距离上一次执行 func 的时间差
@@ -210,7 +230,7 @@ util.debounce = function (func, wait, options) {
     // ----------- 对外 3 个方法 -----------
     // 取消函数延迟执行
     // 取消函数延迟执行
-    function cancel() {
+    function cancel () {
         // 清除定时器
         if (timerId !== undefined) {
             cancelTimer(timerId)
@@ -223,21 +243,21 @@ util.debounce = function (func, wait, options) {
 
     // 立即执行 func
     // 立即执行 func
-    function flush() {
+    function flush () {
         return timerId === undefined ? result : trailingEdge(Date.now())
     }
 
 
     // 检查当前是否在计时中
     // 检查当前是否在计时中
-    function pending() {
+    function pending () {
         return timerId !== undefined
     }
 
 
     // ----------- 入口函数 -----------
     // 入口函数，返回此函数
-    function debounced(...args) {
+    function debounced (...args) {
         // 获取当前时间
         const time = Date.now()
         // 判断此时是否应该执行 func 函数
