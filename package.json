@@ -16,6 +16,7 @@
     "cross-env": "^6.0.3",
     "css-loader": "^3.0.0",
     "dayjs": "^1.8.14",
+    "eslint-plugin-html": "^6.0.2",
     "fastclick": "^1.0.6",
     "file-loader": "^4.0.0",
     "font-awesome": "^4.7.0",
@@ -55,18 +56,14 @@
     "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
     "vue-template-compiler": "^2.6.10"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
+  "lint-staged": {
+    "*.js": [
+      "vue-cli-service lint",
+      "git add"
     ],
-    "rules": {},
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
+    "*.vue": [
+      "vue-cli-service lint",
+      "git add"
+    ]
   }
 }
