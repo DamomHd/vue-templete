@@ -1,4 +1,4 @@
-.icon { background-image: url(../images/product.png) ;}
+.icon.icon-product { background-image: url(../images/product.png) ;}
 .icon.icon-car { width: 0.6933333333333334rem ; height: 0.6933333333333334rem; background-position: -5.093333333333334rem -5.8933333333333335rem;background-repeat: no-repeat;background-size: 9.813333333333333rem 8.986666666666666rem; }
 .icon.icon-card_close { width: 1.2266666666666666rem ; height: 1.2266666666666666rem; background-position: -5.68rem -6.666666666666667rem;background-repeat: no-repeat;background-size: 9.813333333333333rem 8.986666666666666rem; }
 .icon.icon-card_money { width: 0.5866666666666667rem ; height: 0.5866666666666667rem; background-position: -6.586666666666667rem -5.8933333333333335rem;background-repeat: no-repeat;background-size: 9.813333333333333rem 8.986666666666666rem; }

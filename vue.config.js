@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2020-04-29 18:55:56
+ * @LastEditTime: 2020-04-30 11:03:00
  * @description:
  */
 var fs = require('fs')
@@ -22,12 +22,12 @@ const SpritesmithPlugin = require('webpack-spritesmith')
 // const CopyPlugin = require('copy-webpack-plugin');
 //Cli3 引入编译分析  添加包 vue add webpack-bundle-analyzer  执行 npm run build --report
 const templateFunction = function(data) {
+  let prefix = data.spritesheet.image.replace(/(.*\/)*([^.]+).*/gi, '$2')
   //雪碧图原始宽高 px
   let { width, height } = data.spritesheet
-  var shared = '.icon { background-image: url(I) ;}'.replace(
-    'I',
-    data.sprites[0].image
-  )
+  var shared = '.icon.icon-N { background-image: url(I) ;}'
+    .replace('I', data.sprites[0].image)
+    .replace('N', prefix)
 
   var perSprite = data.sprites
     .map(function(sprite) {
@@ -70,7 +70,10 @@ spriteDirs.forEach((filename) => {
         // 可以是字符串、或者数组
         css: [
           [
-            path.resolve(__dirname, `./src/assets/style/${filename}.css`),
+            path.resolve(
+              __dirname,
+              `./src/assets/style/sprite/${filename}.css`
+            ),
             {
               format: 'function_based_template',
             },
@@ -220,60 +223,6 @@ module.exports = {
           }),
         ])
       })
-
-    // 将小图标拼接成雪碧图
-    // config.plugin('webpack-spritesmith').use(SpritesmithPlugin, [
-    //   {
-    //     // 目标小图标
-    //     src: {
-    //       // 图片所在文件夹（无视子文件夹）
-    //       cwd: path.resolve(__dirname, './src/assets/images/sprites/product'),
-    //       // 匹配 png 文件，可以用glob语法，比如 '*.(png|jpg)' 这样；
-    //       // 但png和jpg拼一起，有时候图片无法正常显示
-    //       glob: '*.png',
-    //     },
-    //     // 输出雪碧图文件及样式文件
-    //     target: {
-    //       // 将其输出到 src/assets 目录下
-    //       // 这个是打包前的目录，所以不要学某个教程将其输出到 dist 目录下
-    //       image: path.resolve(__dirname, './src/assets/images/sprites.png'),
-    //       // 可以是字符串、或者数组
-    //       css: [
-    //         [
-    //           path.resolve(__dirname, './src/assets/style/sprites.css'),
-    //           {
-    //             format: 'function_based_template',
-    //           },
-    //         ],
-    //       ],
-    //     },
-    //     apiOptions: {
-    //       generateSpriteName: function() {
-    //         // console.log(arguments)
-    //         var fileName = arguments[0]
-    //           .match(/[^\\]+$/)[0]
-    //           .replace(/\.[a-zA-Z]+/, '')
-    //         // console.log(fileName)
-    //         return fileName
-    //       },
-    //       // 简单来说，这个就是雪碧图的 css 文件怎么找到 雪碧图的 png 文件
-    //       cssImageRef: '../images/sprites.png',
-    //     },
-    //     customTemplates: {
-    //       function_based_template: templateFunction,
-    //     },
-    //     spritesmithOptions: {
-    //       algorithm: 'binary-tree',
-    //       padding: 8,
-    //     },
-    //     // retina: '@2x'
-    //     // retina: {
-    //     //     type: 'retina',
-    //     //     normalName: path.resolve(__dirname, './src/assets/images/sprite.png'),
-    //     //     retinaName: path.resolve(__dirname, './src/assets/images/sprite1.png')
-    //     // },
-    //   },
-    // ])
 
     //配置生成的index.html生成的标签自带引号
     //编译之后的index.html没有引号是缺省设置，是由HtmlWebpackPlugin中的minify设置的，这是一个标准设置，它的作用就是去除所有html中的注释、回车换行、引号等等；
