@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2019-11-26 18:50:10
+ * @LastEditTime: 2020-07-14 14:04:39
  * @description: 
  -->
 # test
@@ -50,3 +50,20 @@ import FastClick from 'fastclick'; // 引入插件
 FastClick.attach(document.body); // 使用 fastclick
 ```
 Gitmoji Commit 演示
+
+# 解决cli3 热更新慢
+npm install babel-plugin-dynamic-import-node --save-dev
+
+在.babelrc添加
+```json
+{
+    "env": {
+        "development": {
+            "plugins": [
+                "dynamic-import-node"
+            ]
+        }
+    }
+}
+
+```
