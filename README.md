@@ -4,7 +4,7 @@
  * @Author: hongda_huang
  * @Date: 2019-07-02 11:46:02
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2020-07-14 14:04:39
+ * @LastEditTime: 2020-07-14 15:04:20
  * @description: 
  -->
 # test
@@ -67,3 +67,10 @@ npm install babel-plugin-dynamic-import-node --save-dev
 }
 
 ```
+
+# terser-webpack-plugin替代uglifyjs-webpack-plugin
+
+因为uglifyjs不支持es6语法
+
+yarn add terser-webpack-plugin -D
+

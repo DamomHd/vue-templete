@@ -2,30 +2,28 @@
  * @Descripttion: Vincent
  * @version: v1.0
  * @Author: hongda_huang
- * @Date: 2019-07-02 11:46:02
- * @LastEditors  : vincent_Huanghd@126.com
- * @LastEditTime : 2019-12-24 10:48:54
- * @description: 
- -->
+ * @Date: 2020-07-15 10:35:05
+ * @LastEditors: vincent_Huanghd@126.com
+ * @LastEditTime: 2020-07-15 17:13:54
+ * @description:
+-->
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  name: "app",
-  data() {
-    return {};
+  name: 'App',
+  data () {
+    return {}
   },
   computed: {},
-  mounted() {},
-  //移动端追加active效果
-  created() {
-    document.body.addEventListener("touchstart", () => {});
-  }
-};
+  mounted () {},
+  created () {
+    document.body.addEventListener('touchstart', () => {}) // 移动端追加active效果
+  }}
 </script>
 
 <style>

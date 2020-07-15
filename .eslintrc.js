@@ -4,40 +4,55 @@
  * @Author: hongda_huang
  * @Date: 2020-04-24 09:53:10
  * @LastEditors: vincent_Huanghd@126.com
- * @LastEditTime: 2020-04-24 10:17:07
+ * @LastEditTime: 2020-07-15 17:13:46
  * @description:
- * "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "rules": {},
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  }
  */
 module.exports = {
     root: true,
+
     env: {
-        "node": true
+        browser: true,
+        node: true,
+        es6: true
     },
-    "extends": [
-        "plugin:vue/essential",
-        "eslint:recommended"
+
+
+    plugins: ["vue"], //prettier
+    extends: [
+        "eslint:recommended",
+        "plugin:vue/essential"
     ],
-    plugins: [
-        'vue', 'html'
-    ],
+    globals: {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+
     rules: {
-        'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+        'no-console':process.env.NODE_ENV === 'production'?'error':'off',
+        'no-debugger':process.env.NODE_ENV === 'production'?'error':'off',
+        'no-multiple-empty-lines':0,
+        'linebreak-style': ['error', 'windows'],
+        'comma-dangle': ['error', 'never'], // 修正 eslint-plugin-vue 带来的问题
+        "space-before-function-paren": 1,
+        "no-duplicate-imports": 1,
+        // 代码后不使用分号
+        semi: ['error', 'never'],
+         // 一行最多几个属性
+        'vue/max-attributes-per-line': [
+            'error',
+            {
+            singleline: 5,
+            multiline: {
+                max: 1,
+                allowFirstLine: false
+            }
+            }
+        ],
     },
+
     parserOptions: {
-        "parser": "babel-eslint"
-    }
-}
+        // parser: "vue-eslint-parser", //"babel-eslint"
+        sourceType: "module"
+    },
+    parser: "vue-eslint-parser",
+};
